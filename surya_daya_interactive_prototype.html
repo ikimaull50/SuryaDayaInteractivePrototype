@@ -1,0 +1,2217 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SURYA DAYA — Ekosistem Battery Swapping & EV Charging Tenaga Surya</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        surya: {
+                            teal: '#0E4D64',
+                            dark: '#093545',
+                            emerald: '#10B981',
+                            mint: '#D1FAE5',
+                            gold: '#F59E0B',
+                            amber: '#FEF3C7',
+                            bg: '#F2F6F4',
+                            card: '#FFFFFF'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F2F6F4;
+            color: #0F172A;
+            overflow-x: hidden;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #E2E8F0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0E4D64;
+            border-radius: 9999px;
+        }
+        /* Mobile Phone Frame Styling */
+        .phone-frame {
+            width: 100%;
+            max-width: 412px;
+            height: 820px;
+            border: 10px solid #0F172A;
+            border-radius: 44px;
+            box-shadow: 0 25px 50px -12px rgba(14, 77, 100, 0.28);
+            background: #F4F8F6;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .phone-frame.expanded {
+            max-width: 960px;
+            height: auto;
+            min-height: 780px;
+            border-width: 4px;
+            border-radius: 24px;
+        }
+        /* Pulse & Solar Flow Animations */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .animate-float {
+            animation: floatSlow 3.5s ease-in-out infinite;
+        }
+        @keyframes energyFlow {
+            0% { stroke-dashoffset: 24; }
+            100% { stroke-dashoffset: 0; }
+        }
+        .energy-line {
+            stroke-dasharray: 6 6;
+            animation: energyFlow 1s linear infinite;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-surya-emerald selection:text-white">
+
+    <!-- TOP ENTERPRISE NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-surya-teal text-white shadow-lg border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <!-- Brand Identity -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-amber-500 to-emerald-500 flex items-center justify-center shadow-md relative">
+                    <i class="ph-fill ph-sun text-2xl text-slate-900"></i>
+                    <i class="ph-fill ph-lightning text-xs text-white absolute -bottom-1 -right-1 bg-surya-teal rounded-full p-0.5"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-display font-extrabold text-lg tracking-tight leading-none">SURYA DAYA</span>
+                        <span class="hidden sm:inline-block text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                            Circular Economy MVP 2026
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-teal-100/80 hidden md:block">Solusi Energi Terbarukan • Universitas Terbuka Bandung</p>
+                </div>
+            </div>
+
+            <!-- 3-Way Mode Switcher -->
+            <nav class="flex items-center bg-surya-dark/90 p-1 rounded-xl border border-white/10 overflow-x-auto max-w-full">
+                <button onclick="switchMainMode('b2c')" id="modeBtn-b2c" class="mode-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-emerald-500 text-white shadow">
+                    <i class="ph-bold ph-device-mobile text-base"></i>
+                    <span>1. SuryaGo App</span>
+                    <span class="hidden lg:inline text-[10px] bg-black/20 px-1.5 py-0.5 rounded">B2C</span>
+                </button>
+                <button onclick="switchMainMode('b2b')" id="modeBtn-b2b" class="mode-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-100 hover:text-white">
+                    <i class="ph-bold ph-chart-polar text-base"></i>
+                    <span>2. SuryaESG & Loop</span>
+                    <span class="hidden lg:inline text-[10px] bg-white/10 px-1.5 py-0.5 rounded">B2B + IoT</span>
+                </button>
+                <button onclick="switchMainMode('iot')" id="modeBtn-iot" class="mode-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-100 hover:text-white">
+                    <i class="ph-bold ph-charging-station text-base"></i>
+                    <span>3. Station Hub 24/7</span>
+                    <span class="hidden lg:inline text-[10px] bg-amber-400/20 text-amber-300 px-1.5 py-0.5 rounded">Hardware</span>
+                </button>
+            </nav>
+
+            <!-- Proposal Info & Quick Pitch Button -->
+            <div class="hidden xl:flex items-center gap-2">
+                <button onclick="openModal('teamModal')" class="flex items-center gap-1.5 text-xs font-medium bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition">
+                    <i class="ph-bold ph-users-three text-amber-300 text-sm"></i>
+                    <span>Tim & Proposal</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- LIVE TELEMETRY TICKER BAR -->
+    <div class="bg-slate-900 text-slate-300 text-xs border-b border-slate-800 py-1.5 px-4">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-4 overflow-x-auto no-scrollbar">
+                <span class="flex items-center gap-1.5 text-emerald-400 font-medium shrink-0">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    SEMS IoT Cloud: Online
+                </span>
+                <span class="text-slate-600">|</span>
+                <span class="shrink-0"><i class="ph-fill ph-sun text-amber-400 mr-1"></i>Cuaca Bandung: <strong id="tickerWeather" class="text-white">Cerah (Solar PV 4.8 kWp Aktif)</strong></span>
+                <span class="text-slate-600 hidden sm:inline">|</span>
+                <span class="hidden sm:inline shrink-0"><i class="ph-fill ph-Recycle text-emerald-400 mr-1"></i>SuryaLoop BESS: <strong id="tickerBess" class="text-white">92% (18.4 kWh)</strong></span>
+                <span class="text-slate-600 hidden md:inline">|</span>
+                <span class="hidden md:inline shrink-0"><i class="ph-fill ph-shield-check text-sky-400 mr-1"></i>Skema Legal: <strong class="text-white">Service Fee (Patuh ESDM Non-IUPTL)</strong></span>
+            </div>
+            <div class="flex items-center gap-3 ml-auto">
+                <span id="globalActiveBookingBadge" class="hidden items-center gap-1.5 bg-amber-500/20 text-amber-300 border border-amber-400/30 px-2.5 py-0.5 rounded-full font-semibold">
+                    <i class="ph-bold ph-timer"></i>
+                    <span>Booking Slot #04: <span id="globalTimerText">14:59</span></span>
+                </span>
+                <button onclick="openModal('suriModal')" class="text-amber-300 hover:underline flex items-center gap-1 font-medium">
+                    <span>Tanya SURI</span>
+                    <i class="ph-bold ph-sparkle"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT WORKSPACE -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- ======================================================================= -->
+        <!-- MODE 1: SURYAGO MOBILE APP (B2C) + CONTEXT SIDEBAR                      -->
+        <!-- ======================================================================= -->
+        <section id="view-b2c" class="space-y-6">
+            <div class="flex flex-col lg:flex-row items-start justify-center gap-8">
+
+                <!-- Left Column: Interactive Mobile App Frame -->
+                <div class="w-full flex flex-col items-center">
+                    <!-- Controls above phone -->
+                    <div class="w-full max-w-[412px] flex items-center justify-between mb-3 px-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-surya-teal bg-teal-100 px-2.5 py-1 rounded-md">
+                                Prototipe SuryaGo v2.6 (Flutter UI)
+                            </span>
+                        </div>
+                        <button onclick="togglePhoneExpand()" id="expandPhoneBtn" class="text-xs font-semibold text-slate-600 hover:text-surya-teal flex items-center gap-1 bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">
+                            <i class="ph-bold ph-arrows-out-simple"></i>
+                            <span>Perlebar Layar</span>
+                        </button>
+                    </div>
+
+                    <!-- PHONE SIMULATOR -->
+                    <div id="phoneFrame" class="phone-frame">
+                        <!-- Phone Top Status Bar -->
+                        <div class="bg-surya-teal text-white px-6 pt-3 pb-2 flex items-center justify-between text-[11px] font-medium select-none shrink-0">
+                            <span>09:41 WIB</span>
+                            <div class="w-20 h-4 bg-slate-950 rounded-full mx-auto"></div>
+                            <div class="flex items-center gap-1.5">
+                                <i class="ph-fill ph-cell-signal-full"></i>
+                                <i class="ph-fill ph-wifi-high"></i>
+                                <i class="ph-fill ph-battery-Charging text-emerald-300 text-sm"></i>
+                            </div>
+                        </div>
+
+                        <!-- App Top Greeting Bar -->
+                        <div class="bg-gradient-to-b from-surya-teal to-[#125E75] text-white px-5 pt-2 pb-4 rounded-b-3xl shadow-md shrink-0">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-[11px] font-bold tracking-widest uppercase text-emerald-300">HALO, DERIS & CHINDY!</span>
+                                        <span class="text-[10px] bg-white/15 px-2 py-0.5 rounded-full font-medium">Mode Demo</span>
+                                    </div>
+                                    <h1 class="font-display font-extrabold text-lg sm:text-xl leading-tight mt-0.5">
+                                        Energi baik, perjalanan lancar.
+                                    </h1>
+                                </div>
+                                <button onclick="switchAppTab('profil')" class="w-10 h-10 rounded-2xl bg-white/15 hover:bg-white/25 flex items-center justify-center border border-white/20 transition relative">
+                                    <span class="font-display font-bold text-sm">DC</span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 absolute -top-0.5 -right-0.5 border border-surya-teal"></span>
+                                </button>
+                            </div>
+
+                            <!-- Quick User Eco Pill Bar -->
+                            <div class="mt-3 grid grid-cols-3 gap-2 bg-black/20 p-2 rounded-2xl border border-white/10 text-xs">
+                                <div class="px-2 py-1">
+                                    <p class="text-[10px] text-teal-200">Saldo / Paket</p>
+                                    <p class="font-bold text-white truncate" id="userQuotaDisplay">1x Free Voucher</p>
+                                </div>
+                                <div class="px-2 py-1 border-x border-white/10">
+                                    <p class="text-[10px] text-teal-200">CO₂ Dihemat</p>
+                                    <p class="font-bold text-emerald-300"><span id="userCarbonSaved">14,8</span> kg</p>
+                                </div>
+                                <div class="px-2 py-1">
+                                    <p class="text-[10px] text-teal-200">Kendaraan</p>
+                                    <p class="font-bold text-amber-300 truncate" id="userMotorBrand">Gesits G1</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SCROLLABLE APP VIEWPORT -->
+                        <div class="flex-1 overflow-y-auto px-4 py-4 space-y-4" id="appScrollContainer">
+
+                            <!-- ==================== TAB 1: BERANDA (MAP & STATIONS) ==================== -->
+                            <div id="appTab-beranda" class="space-y-4">
+
+                                <!-- SURI MASCOT BANNER (Exact Match to Page 9 & 25 of Proposal) -->
+                                <div class="bg-gradient-to-r from-[#0D4A61] to-[#13657E] rounded-2xl p-4 text-white shadow-md relative overflow-hidden border border-teal-700/50">
+                                    <div class="flex items-center justify-between gap-3 relative z-10">
+                                        <div class="space-y-1.5 max-w-[65%]">
+                                            <div class="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider bg-amber-400 text-slate-900 px-2 py-0.5 rounded-full">
+                                                <i class="ph-fill ph-sun"></i> Duta Energi Bersih
+                                            </div>
+                                            <h2 class="font-display font-bold text-base leading-snug">
+                                                Kenalan dengan SURI 👋
+                                            </h2>
+                                            <p class="text-xs text-teal-100 leading-relaxed">
+                                                Aku siap menemani perjalanan energi bersihmu tanpa antre &lt;2 menit!
+                                            </p>
+                                            <button onclick="openModal('suriModal')" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-amber-200 pt-1 underline underline-offset-4">
+                                                <span>Lihat panduan &amp; promo</span>
+                                                <i class="ph-bold ph-arrow-right"></i>
+                                            </button>
+                                        </div>
+
+                                        <!-- Custom SVG SURI Mascot (3D Style Sun with Solar Visor & Green Battery) -->
+                                        <div onclick="openModal('suriModal')" class="w-24 h-24 rounded-2xl bg-gradient-to-b from-sky-200/30 to-emerald-300/20 border border-white/20 flex items-center justify-center p-1 cursor-pointer animate-float shrink-0" title="Klik untuk ngobrol sama SURI!">
+                                            <svg viewBox="0 0 120 120" class="w-full h-full drop-shadow-md">
+                                                <!-- Sun Rays -->
+                                                <g fill="#F59E0B">
+                                                    <polygon points="60,4 67,22 53,22" />
+                                                    <polygon points="60,116 67,98 53,98" />
+                                                    <polygon points="4,60 22,67 22,53" />
+                                                    <polygon points="116,60 98,67 98,53" />
+                                                    <polygon points="18,18 35,27 27,35" />
+                                                    <polygon points="102,18 85,27 93,35" />
+                                                    <polygon points="18,102 35,93 27,85" />
+                                                    <polygon points="102,102 85,93 93,85" />
+                                                </g>
+                                                <!-- Sun Head -->
+                                                <circle cx="60" cy="58" r="34" fill="#FBBF24" stroke="#F59E0B" stroke-width="3"/>
+                                                <!-- Solar Panel Forehead Cap -->
+                                                <path d="M35,44 Q60,24 85,44 Z" fill="#0284C7" stroke="#E0F2FE" stroke-width="1.5"/>
+                                                <line x1="48" y1="34" x2="46" y2="44" stroke="#E0F2FE" stroke-width="1"/>
+                                                <line x1="60" y1="31" x2="60" y2="44" stroke="#E0F2FE" stroke-width="1"/>
+                                                <line x1="72" y1="34" x2="74" y2="44" stroke="#E0F2FE" stroke-width="1"/>
+                                                <!-- Eco Green Goggles -->
+                                                <rect x="34" y="46" width="23" height="16" rx="8" fill="#10B981" stroke="#065F46" stroke-width="2.5"/>
+                                                <rect x="63" y="46" width="23" height="16" rx="8" fill="#10B981" stroke="#065F46" stroke-width="2.5"/>
+                                                <line x1="57" y1="54" x2="63" y2="54" stroke="#065F46" stroke-width="3"/>
+                                                <circle cx="45" cy="54" r="4" fill="#064E3B"/>
+                                                <circle cx="75" cy="54" r="4" fill="#064E3B"/>
+                                                <circle cx="43" cy="52" r="1.5" fill="#FFFFFF"/>
+                                                <circle cx="73" cy="52" r="1.5" fill="#FFFFFF"/>
+                                                <!-- Happy Smile -->
+                                                <path d="M49,69 Q60,80 71,69" fill="#991B1B" stroke="#7F1D1D" stroke-width="2" stroke-linecap="round"/>
+                                                <!-- Green Battery Held in Hand -->
+                                                <rect x="14" y="64" width="16" height="26" rx="3" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5" transform="rotate(-15 22 77)"/>
+                                                <polygon points="21,71 18,78 23,78 20,84 26,76 21,76" fill="#FEF08A"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Active Booking Mini Banner (if user has locked a battery) -->
+                                <div id="inAppBookingBanner" class="hidden bg-amber-50 border-2 border-amber-400 rounded-2xl p-3.5 shadow-sm">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2.5">
+                                            <div class="w-9 h-9 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-bold">
+                                                <i class="ph-bold ph-lock-key text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-[11px] font-bold uppercase text-amber-800">Stok Baterai Terkunci</p>
+                                                <p class="text-xs font-bold text-slate-900" id="bannerStationName">Surya Daya Station Hub • Slot #04</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="font-mono font-extrabold text-sm text-amber-900 bg-amber-200 px-2 py-0.5 rounded-lg" id="bannerTimer">14:59</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2.5 flex gap-2">
+                                        <button onclick="switchAppTab('booking')" class="flex-1 bg-surya-teal text-white text-xs font-bold py-2 rounded-xl hover:bg-surya-dark transition flex items-center justify-center gap-1">
+                                            <i class="ph-bold ph-qr-code"></i> Scan QR di Stasiun Sekarang
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- INTERACTIVE ILLUSTRATED MAP ("Di sekitar kamu") -->
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h3 class="font-display font-bold text-sm text-slate-900">Di sekitar kamu (Bandung Raya)</h3>
+                                            <p class="text-[11px] text-slate-500">Klik pin stasiun untuk cek stok baterai &amp; slot AC real-time</p>
+                                        </div>
+                                        <span class="text-[11px] font-semibold text-surya-teal bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200">
+                                            GPS Aktif
+                                        </span>
+                                    </div>
+
+                                    <!-- Interactive SVG Map of Bandung Corridor -->
+                                    <div class="relative w-full h-44 rounded-xl overflow-hidden bg-[#E5F0EC] border border-teal-900/10 select-none">
+                                        <!-- Map Grid & Roads SVG -->
+                                        <svg viewBox="0 0 400 180" class="w-full h-full object-cover">
+                                            <defs>
+                                                <pattern id="grid" width="25" height="25" patternUnits="userSpaceOnUse">
+                                                    <path d="M 25 0 L 0 0 0 25" fill="none" stroke="#CFE3DC" stroke-width="1"/>
+                                                </pattern>
+                                            </defs>
+                                            <rect width="400" height="180" fill="url(#grid)" />
+                                            <!-- Green Zones -->
+                                            <circle cx="80" cy="40" r="45" fill="#D2E9DF" />
+                                            <circle cx="310" cy="130" r="55" fill="#D2E9DF" />
+                                            <!-- River & Main Roads (Dago, Dipatiukur, Asia Afrika, UT Bandung) -->
+                                            <path d="M -10 140 Q 120 70 250 110 T 410 65" fill="none" stroke="#B6D5C9" stroke-width="14" stroke-linecap="round"/>
+                                            <path d="M 60 -10 Q 160 80 190 190" fill="none" stroke="#FFFFFF" stroke-width="6" />
+                                            <path d="M -10 95 Q 190 75 410 115" fill="none" stroke="#FFFFFF" stroke-width="8" />
+                                            <!-- Route Line to Nearest Hub -->
+                                            <path d="M 195 95 Q 240 80 280 70" fill="none" stroke="#10B981" stroke-width="3" class="energy-line"/>
+                                        </svg>
+
+                                        <!-- User Current Position Dot -->
+                                        <div class="absolute left-[46%] top-[48%] -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
+                                            <div class="w-4 h-4 rounded-full bg-blue-600 border-2 border-white shadow-md animate-pulse"></div>
+                                            <span class="text-[9px] font-bold bg-slate-900/80 text-white px-1.5 py-0.5 rounded mt-0.5">Posisi Kamu</span>
+                                        </div>
+
+                                        <!-- Pin 1: Surya Daya Station Hub (UT Bandung) -->
+                                        <button onclick="openBookingModal(1)" class="absolute left-[70%] top-[36%] -translate-x-1/2 -translate-y-1/2 group focus:outline-none" title="Surya Daya Station Hub (2,3 km)">
+                                            <div class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-md flex items-center gap-1 group-hover:scale-110 transition">
+                                                <i class="ph-fill ph-lightning text-amber-300"></i>
+                                                <span>Hub UT (08)</span>
+                                            </div>
+                                            <div class="w-2 h-2 bg-emerald-600 rotate-45 mx-auto -mt-1"></div>
+                                        </button>
+
+                                        <!-- Pin 2: Surya Daya Dago -->
+                                        <button onclick="openBookingModal(2)" class="absolute left-[28%] top-[28%] -translate-x-1/2 -translate-y-1/2 group focus:outline-none" title="Surya Daya Dago (4,8 km)">
+                                            <div class="px-2 py-0.5 rounded-full bg-surya-teal text-white text-[10px] font-bold shadow-md flex items-center gap-1 group-hover:scale-110 transition">
+                                                <i class="ph-fill ph-battery-charging text-emerald-300"></i>
+                                                <span>Dago (04)</span>
+                                            </div>
+                                            <div class="w-2 h-2 bg-surya-teal rotate-45 mx-auto -mt-1"></div>
+                                        </button>
+
+                                        <!-- Pin 3: Surya Daya Dipatiukur -->
+                                        <button onclick="openBookingModal(4)" class="absolute left-[42%] top-[22%] -translate-x-1/2 -translate-y-1/2 group focus:outline-none" title="Surya Daya Dipatiukur (3,1 km)">
+                                            <div class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold shadow-md flex items-center gap-1 group-hover:scale-110 transition">
+                                                <i class="ph-fill ph-lightning text-amber-300"></i>
+                                                <span>DU (06)</span>
+                                            </div>
+                                            <div class="w-2 h-2 bg-emerald-600 rotate-45 mx-auto -mt-1"></div>
+                                        </button>
+
+                                        <!-- Pin 4: Surya Daya Asia Afrika -->
+                                        <button onclick="openBookingModal(3)" class="absolute left-[26%] top-[74%] -translate-x-1/2 -translate-y-1/2 group focus:outline-none" title="Surya Daya Asia Afrika (Maintenance)">
+                                            <div class="px-2 py-0.5 rounded-full bg-slate-600 text-white text-[10px] font-bold shadow-md flex items-center gap-1 group-hover:scale-110 transition">
+                                                <i class="ph-fill ph-plug-charging text-amber-300"></i>
+                                                <span>Asia Afrika (AC)</span>
+                                            </div>
+                                            <div class="w-2 h-2 bg-slate-600 rotate-45 mx-auto -mt-1"></div>
+                                        </button>
+
+                                        <div class="absolute bottom-2 left-2 bg-white/90 backdrop-blur px-2.5 py-1 rounded-lg text-[10px] font-semibold text-slate-700 shadow-sm border border-slate-200">
+                                            Peta Ilustrasi Interaktif • Data Real-Time IoT
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- STATION SEARCH & FILTER PILLS (Matching Page 9 & 25 of Proposal) -->
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3">
+                                    <label class="block text-xs font-bold text-slate-700">Cari Stasiun Surya Daya</label>
+                                    <div class="relative">
+                                        <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                        <input type="text" id="stationSearchInput" oninput="renderStationCards()" placeholder="Cari nama stasiun (mis: Hub, Dago, Asia Afrika)..." class="w-full pl-9 pr-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-surya-teal focus:bg-white transition">
+                                    </div>
+
+                                    <!-- Filter Pills -->
+                                    <div class="flex flex-wrap gap-1.5 pt-1" id="stationFilterPills">
+                                        <button onclick="setStationFilter('all')" data-filter="all" class="st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-surya-teal bg-teal-50 text-surya-teal transition">
+                                            Semua
+                                        </button>
+                                        <button onclick="setStationFilter('near')" data-filter="near" class="st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+                                            &le; 5 km
+                                        </button>
+                                        <button onclick="setStationFilter('open')" data-filter="open" class="st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+                                            Buka
+                                        </button>
+                                        <button onclick="setStationFilter('swap')" data-filter="swap" class="st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+                                            Tukar Baterai
+                                        </button>
+                                        <button onclick="setStationFilter('charging')" data-filter="charging" class="st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+                                            AC Charging
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- DYNAMIC STATION CARDS LIST -->
+                                <div id="stationListContainer" class="space-y-3 pb-4">
+                                    <!-- Populated via JS -->
+                                </div>
+
+                            </div>
+
+                            <!-- ==================== TAB 2: SMART BOOKING & QR SCANNER ==================== -->
+                            <div id="appTab-booking" class="hidden space-y-4">
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-4">
+                                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                        <div>
+                                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Smart Booking Real-Time</span>
+                                            <h3 class="font-display font-bold text-base text-slate-900 mt-1" id="activeBookingTitle">Reservasi Stasiun</h3>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-[10px] text-slate-400">Waktu Kunci Stok</p>
+                                            <p class="font-mono font-extrabold text-lg text-amber-600" id="bookingTabTimer">15:00</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Active Reservation Details Box -->
+                                    <div id="bookingActiveCard" class="bg-slate-50 rounded-xl p-3.5 border border-slate-200 space-y-2.5 text-xs">
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Lokasi Hub:</span>
+                                            <span class="font-bold text-slate-900" id="bkStationName">Surya Daya Station Hub (UT Bandung)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Layanan Dipilih:</span>
+                                            <span class="font-bold text-emerald-700" id="bkServiceType">Tukar Baterai Kilat (&lt;2 Menit)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Unit Terkunci:</span>
+                                            <span class="font-bold text-slate-900" id="bkSlotInfo">Slot Kabinet #04 (SoC 100% • SoH 98%)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Kompatibilitas Armada:</span>
+                                            <span class="font-semibold text-slate-800" id="bkMotorBrand">Multi-Brand (Gesits / Smooth / Volta)</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-slate-500">Metode Pembayaran (SNAP BI):</span>
+                                            <span class="font-bold text-surya-teal" id="bkPaymentMethod">QRIS / Voucher Promo</span>
+                                        </div>
+                                        <div class="pt-2 border-t border-slate-200 flex justify-between items-center">
+                                            <div>
+                                                <span class="text-slate-500 block">Biaya Jasa Fasilitas (Service Fee):</span>
+                                                <span class="text-[10px] text-emerald-600 font-medium">*Patuh Regulasi ESDM Non-IUPTL</span>
+                                            </div>
+                                            <span class="font-display font-extrabold text-base text-slate-900" id="bkTotalPrice">Rp 0 (Free Trial)</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Interactive QR Code & 2-Minute Swap Simulator -->
+                                    <div class="bg-gradient-to-b from-surya-teal to-surya-dark text-white rounded-2xl p-5 text-center space-y-3">
+                                        <div class="w-36 h-36 mx-auto bg-white p-3 rounded-2xl shadow-inner flex flex-col items-center justify-center relative">
+                                            <!-- Simulated QR Matrix -->
+                                            <i class="ph-fill ph-qr-code text-7xl text-slate-900"></i>
+                                            <span class="text-[9px] font-mono font-bold text-slate-600 mt-1">SD-HUB01-SLOT04</span>
+                                        </div>
+                                        <p class="text-xs text-teal-100 max-w-xs mx-auto">
+                                            Arahkan kamera ke QR Code pada layar <strong>Swapping Cabinet</strong> atau <strong>AC Wallbox</strong> di stasiun untuk membuka kunci otomatis.
+                                        </p>
+
+                                        <!-- Progress Bar during Swap Simulation -->
+                                        <div id="swapProgressBox" class="hidden bg-black/30 rounded-xl p-3 text-left space-y-2 border border-white/10">
+                                            <div class="flex justify-between text-xs font-semibold">
+                                                <span id="swapStepLabel" class="text-amber-300">1/4 Memverifikasi QR &amp; Membuka Slot...</span>
+                                                <span id="swapElapsedSec" class="font-mono">00:18 dtk</span>
+                                            </div>
+                                            <div class="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                                                <div id="swapProgressBar" class="h-full bg-emerald-400 transition-all duration-300" style="width: 25%"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="pt-1 flex flex-col sm:flex-row gap-2">
+                                            <button onclick="simulateInstantSwap()" id="btnSimulateSwap" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-display font-extrabold text-xs py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                                                <i class="ph-bold ph-lightning text-base"></i>
+                                                <span>Simulasikan Scan QR &amp; Tukar Baterai (&lt;2 Menit)</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ==================== TAB 3: AKTIVITAS & DAMPAK ESG PERSONAL ==================== -->
+                            <div id="appTab-aktivitas" class="hidden space-y-4">
+                                <!-- Personal ESG Impact Summary Card -->
+                                <div class="bg-gradient-to-br from-emerald-700 to-surya-teal text-white rounded-2xl p-4 shadow-md space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">
+                                            Laporan Karbon Personal (SuryaESG)
+                                        </span>
+                                        <i class="ph-fill ph-leaf text-xl text-emerald-300"></i>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-3 pt-1">
+                                        <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+                                            <p class="text-[11px] text-emerald-200">Total Reduksi Emisi</p>
+                                            <p class="font-display font-extrabold text-xl mt-0.5"><span id="actTotalCarbon">14,8</span> kg CO₂</p>
+                                            <p class="text-[10px] text-emerald-300 mt-0.5">Setara 2,4 pohon ditanam</p>
+                                        </div>
+                                        <div class="bg-black/20 rounded-xl p-3 border border-white/10">
+                                            <p class="text-[11px] text-emerald-200">Penghematan vs BBM</p>
+                                            <p class="font-display font-extrabold text-xl text-amber-300 mt-0.5" id="actSavedMoney">Rp 142.000</p>
+                                            <p class="text-[10px] text-teal-100 mt-0.5">Bulan Oktober 2026</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Activity Filter Pills (Matching Page 25 Screenshot) -->
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="font-display font-bold text-sm text-slate-900">Riwayat Aktivitas &amp; Resi Digital</h3>
+                                        <span class="text-[11px] text-slate-400" id="txCountBadge">3 Transaksi</span>
+                                    </div>
+                                    <div class="flex gap-1.5">
+                                        <button onclick="filterActivity('all')" class="act-filter-btn px-3 py-1 rounded-full text-xs font-semibold bg-surya-teal text-white">Semua</button>
+                                        <button onclick="filterActivity('swap')" class="act-filter-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">Tukar Baterai</button>
+                                        <button onclick="filterActivity('charging')" class="act-filter-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">AC Charging</button>
+                                    </div>
+
+                                    <!-- Activity List Container -->
+                                    <div id="activityListContainer" class="space-y-2.5 pt-1">
+                                        <!-- Populated via JS -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ==================== TAB 4: PROFIL, LANGGANAN & REFERRAL 1-FOR-1 ==================== -->
+                            <div id="appTab-profil" class="hidden space-y-4">
+                                <!-- User Profile Card (Matching Page 25 "Deris - Akun demo prototipe") -->
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 rounded-2xl bg-surya-teal text-white font-display font-extrabold text-lg flex items-center justify-center">
+                                            DC
+                                        </div>
+                                        <div>
+                                            <h3 class="font-display font-bold text-sm text-slate-900">Deristo &amp; Chindy (Demo UT)</h3>
+                                            <p class="text-xs text-slate-500">Armada Mitra &amp; Komuter Bandung Raya</p>
+                                            <span class="inline-block mt-1 text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                                                 Terverifikasi • SNAP BI Cashless
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Multi-Brand Vehicle Selector -->
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-2.5">
+                                    <label class="block text-xs font-bold text-slate-800">Kendaraan Listrik Terdaftar (Multi-Brand Compatible)</label>
+                                    <select id="profileMotorSelect" onchange="updateUserMotor(this.value)" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold text-slate-800">
+                                        <option value="Gesits G1 (72V 20Ah)">Gesits G1 (72V 20Ah - Armada Ojol)</option>
+                                        <option value="Smooth Tempur">Smooth Tempur (64V 21.5Ah - Kurir Logistik)</option>
+                                        <option value="Volta 401">Volta 401 (60V 23Ah - Mitra Pengantaran)</option>
+                                        <option value="Alva One">Alva One (Komuter Mahasiswa + AC Wallbox)</option>
+                                        <option value="United T1800">United T1800 (Komuter Harian)</option>
+                                    </select>
+                                    <p class="text-[11px] text-slate-500">
+                                        Rak modular Surya Daya mendukung berbagai merek motor listrik komersial dan pribadi.
+                                    </p>
+                                </div>
+
+                                <!-- Subscription Package Switcher (Pay-Per-Swap vs Kuota Bulanan) -->
+                                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-3">
+                                    <h4 class="font-display font-bold text-xs uppercase tracking-wider text-slate-500">Paket Layanan &amp; Metode Pembayaran</h4>
+                                    <div class="grid grid-cols-2 gap-2.5 text-xs">
+                                        <div class="border-2 border-emerald-500 bg-emerald-50/50 rounded-xl p-3">
+                                            <span class="text-[10px] font-bold text-emerald-700 uppercase">Pay-Per-Swap</span>
+                                            <p class="font-display font-extrabold text-sm text-slate-900 mt-0.5">Rp 9.000 <span class="text-[10px] font-normal">/tukar</span></p>
+                                            <p class="text-[10px] text-slate-500 mt-1">AC Charging: Rp 4.000/jam</p>
+                                        </div>
+                                        <div onclick="activateMonthlyPlan()" class="border border-slate-200 hover:border-surya-teal rounded-xl p-3 cursor-pointer transition">
+                                            <span class="text-[10px] font-bold text-surya-teal uppercase">Paket Armada Bulanan</span>
+                                            <p class="font-display font-extrabold text-sm text-slate-900 mt-0.5">Rp 200.000 <span class="text-[10px] font-normal">/bln</span></p>
+                                            <p class="text-[10px] text-emerald-700 font-semibold mt-1">Klik untuk Aktifkan (30x Swap)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- REFERRAL "1-FOR-1 SWAP" PROGRAM (Page 17 Proposal Strategy) -->
+                                <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-2xl p-4 text-slate-950 shadow-sm space-y-2.5">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-[10px] font-extrabold uppercase tracking-wider bg-black/15 px-2 py-0.5 rounded-full">
+                                            Program Rujukan Berantai (AARRR Funnel)
+                                        </span>
+                                        <i class="ph-bold ph-gift text-xl"></i>
+                                    </div>
+                                    <h4 class="font-display font-extrabold text-sm">
+                                        Ajak 1 Teman Ojol/Mahasiswa = Gratis 1x Tukar Baterai!
+                                    </h4>
+                                    <p class="text-xs text-slate-900/90">
+                                        Bagikan kode referral kamu &amp; dapatkan stiker reflektif helm gratis di stasiun.
+                                    </p>
+                                    <div class="flex items-center gap-2 pt-1">
+                                        <input type="text" id="referralCodeInput" value="SURYA-UTBDG26" readonly class="bg-white/90 text-slate-900 font-mono font-bold text-xs px-3 py-2 rounded-xl flex-1 focus:outline-none">
+                                        <button onclick="copyReferralCode()" class="bg-slate-900 text-white text-xs font-bold px-3.5 py-2 rounded-xl hover:bg-slate-800 transition flex items-center gap-1">
+                                            <i class="ph-bold ph-copy"></i> Salin &amp; Klaim
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- PHONE BOTTOM NAVIGATION BAR -->
+                        <div class="bg-white border-t border-slate-200 px-3 py-2 grid grid-cols-4 gap-1 shrink-0 select-none">
+                            <button onclick="switchAppTab('beranda')" id="navTab-beranda" class="app-nav-btn flex flex-col items-center py-1 rounded-xl text-surya-teal font-bold">
+                                <i class="ph-fill ph-compass text-xl"></i>
+                                <span class="text-[10px] mt-0.5">Beranda</span>
+                            </button>
+                            <button onclick="switchAppTab('booking')" id="navTab-booking" class="app-nav-btn flex flex-col items-center py-1 rounded-xl text-slate-400 hover:text-slate-700 font-medium relative">
+                                <i class="ph-bold ph-qr-code text-xl"></i>
+                                <span class="text-[10px] mt-0.5">Smart Booking</span>
+                                <span id="navBookingDot" class="hidden w-2 h-2 rounded-full bg-amber-500 absolute top-1 right-5"></span>
+                            </button>
+                            <button onclick="switchAppTab('aktivitas')" id="navTab-aktivitas" class="app-nav-btn flex flex-col items-center py-1 rounded-xl text-slate-400 hover:text-slate-700 font-medium">
+                                <i class="ph-bold ph-leaf text-xl"></i>
+                                <span class="text-[10px] mt-0.5">Aktivitas ESG</span>
+                            </button>
+                            <button onclick="switchAppTab('profil')" id="navTab-profil" class="app-nav-btn flex flex-col items-center py-1 rounded-xl text-slate-400 hover:text-slate-700 font-medium">
+                                <i class="ph-bold ph-user-circle text-xl"></i>
+                                <span class="text-[10px] mt-0.5">Profil &amp; Promo</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Guide & Ecosystem Overview Panel -->
+                <div class="w-full lg:max-w-md xl:max-w-lg space-y-5">
+                    <!-- Quick Scenario Tester Card -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                                    Panduan Uji Coba Juri / Penguji
+                                </span>
+                                <h2 class="font-display font-extrabold text-lg text-slate-900 mt-1">
+                                    Simulasi Alur Terintegrasi Surya Daya
+                                </h2>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Prototipe ini mendemonstrasikan bagaimana transaksi di aplikasi <strong>SuryaGo (B2C)</strong> secara otomatis memperbarui stok kabinet di <strong>Station Hub 24/7</strong> dan menambahkan capaian reduksi karbon di <strong>SuryaESG Dashboard (B2B)</strong>.
+                        </p>
+
+                        <!-- 3 Interactive Quick Demo Triggers -->
+                        <div class="space-y-2.5 text-xs">
+                            <div onclick="openBookingModal(1)" class="p-3 rounded-xl border border-slate-200 hover:border-surya-teal bg-slate-50/70 hover:bg-teal-50/40 cursor-pointer transition flex items-start gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-surya-teal text-white font-bold flex items-center justify-center shrink-0 mt-0.5">1</div>
+                                <div>
+                                    <p class="font-bold text-slate-900">Coba Fitur "Smart Booking 15 Menit" (Bebas Antre)</p>
+                                    <p class="text-slate-500 mt-0.5">Klik untuk mengunci stok baterai penuh di <em>Surya Daya Station Hub</em> sebelum tiba di lokasi.</p>
+                                </div>
+                            </div>
+
+                            <div onclick="switchAppTab('booking'); simulateInstantSwap();" class="p-3 rounded-xl border border-slate-200 hover:border-emerald-600 bg-slate-50/70 hover:bg-emerald-50/40 cursor-pointer transition flex items-start gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-emerald-600 text-white font-bold flex items-center justify-center shrink-0 mt-0.5">2</div>
+                                <div>
+                                    <p class="font-bold text-slate-900">Simulasikan Penukaran Kilat &lt;2 Menit &amp; Resi Karbon</p>
+                                    <p class="text-slate-500 mt-0.5">Uji proses scan QR, verifikasi IoT State of Health (SoH), dan penerbitan resi Service Fee + Carbon Offset.</p>
+                                </div>
+                            </div>
+
+                            <div onclick="switchMainMode('b2b')" class="p-3 rounded-xl border border-slate-200 hover:border-amber-500 bg-slate-50/70 hover:bg-amber-50/40 cursor-pointer transition flex items-start gap-3">
+                                <div class="w-7 h-7 rounded-lg bg-amber-500 text-slate-950 font-bold flex items-center justify-center shrink-0 mt-0.5">3</div>
+                                <div>
+                                    <p class="font-bold text-slate-900">Pantau Dampak B2B di Portal SuryaESG &amp; SuryaLoop</p>
+                                    <p class="text-slate-500 mt-0.5">Lihat bagaimana baterai yang SoH-nya menurun dialihfungsikan menjadi penyimpanan surya (Second-Life BESS).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Key Value Propositions from Proposal -->
+                    <div class="bg-surya-teal text-white rounded-2xl p-5 shadow-md space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-display font-bold text-sm uppercase tracking-wider text-emerald-300">
+                                Keunggulan Kompetitif Proposal
+                            </h3>
+                            <span class="text-[11px] bg-white/10 px-2.5 py-0.5 rounded-full">Halaman 11-13</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <div class="flex items-center gap-1.5 font-bold text-amber-300 mb-1">
+                                    <i class="ph-fill ph-scales"></i> Patuh Regulasi ESDM
+                                </div>
+                                <p class="text-teal-100 text-[11px] leading-relaxed">
+                                    Menggunakan skema <strong>Service Fee (Biaya Jasa Fasilitas)</strong> &amp; sewa baterai, bukan jual kembali listrik per kWh (Non-IUPTL).
+                                </p>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <div class="flex items-center gap-1.5 font-bold text-emerald-300 mb-1">
+                                    <i class="ph-fill ph-arrows-clockwise"></i> Sirkularitas SuryaLoop
+                                </div>
+                                <p class="text-teal-100 text-[11px] leading-relaxed">
+                                    Baterai motor dengan SoH &lt;80% (First-Life) dialihfungsikan menjadi cadangan stasiun <strong>Second-Life BESS</strong>.
+                                </p>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <div class="flex items-center gap-1.5 font-bold text-sky-300 mb-1">
+                                    <i class="ph-fill ph-plugs-connected"></i> Dual-Service Modular
+                                </div>
+                                <p class="text-teal-100 text-[11px] leading-relaxed">
+                                    1 Kabinet Swapping (&lt;2 menit untuk Ojol/Kurir) + 2 titik <strong>AC Wallbox 7,4 kW</strong> untuk komuter singgah.
+                                </p>
+                            </div>
+                            <div class="bg-white/10 p-3 rounded-xl border border-white/10">
+                                <div class="flex items-center gap-1.5 font-bold text-amber-300 mb-1">
+                                    <i class="ph-fill ph-buildings"></i> Amenity Partnership
+                                </div>
+                                <p class="text-teal-100 text-[11px] leading-relaxed">
+                                    Zero sewa lahan di awal (bagi hasil 10-15%) + Laporan <strong>SuryaESG</strong> untuk Green Campus/Building.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ======================================================================= -->
+        <!-- MODE 2: SURYAESG & SURYALOOP PORTAL (B2B AMENITY PARTNER & IOT ADMIN)   -->
+        <!-- ======================================================================= -->
+        <section id="view-b2b" class="hidden space-y-6">
+
+            <!-- B2B Top Header & Partner Selector -->
+            <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
+                            SaaS Portal B2B • SuryaESG &amp; SuryaLoop
+                        </span>
+                        <span class="text-xs text-slate-400">Lisensi Mitra: Rp 1,5 Jt - 3 Jt/bln</span>
+                    </div>
+                    <h1 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 mt-1">
+                        Dashboard Kepatuhan ESG &amp; Siklus Baterai Sirkular
+                    </h1>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Pilih Mitra Lokasi (Amenity Partner)</label>
+                        <select id="b2bPartnerSelect" onchange="updateB2BDashboard()" class="text-xs font-bold bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-slate-800 focus:outline-none focus:border-surya-teal">
+                            <option value="ut">Kampus Universitas Terbuka Bandung (Green Campus)</option>
+                            <option value="dago">Surya Daya Dago (Kafe &amp; Co-Working Partner)</option>
+                            <option value="all">Konsolidasi Bandung Raya (3-5 Titik Pilot SOM)</option>
+                        </select>
+                    </div>
+                    <button onclick="openModal('esgReportModal')" class="bg-surya-teal hover:bg-surya-dark text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow flex items-center gap-2 transition mt-auto">
+                        <i class="ph-bold ph-file-pdf text-base text-amber-300"></i>
+                        <span>Unduh Sertifikat &amp; Laporan ESG Resmi</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 KPI METRIC CARDS -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+                        <span>Total Reduksi Emisi Karbon</span>
+                        <span class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center"><i class="ph-fill ph-cloud-check text-lg"></i></span>
+                    </div>
+                    <p class="font-display font-extrabold text-2xl text-slate-900 mt-2" id="b2bKpiCarbon">1.842,6 kg CO₂e</p>
+                    <p class="text-xs text-emerald-600 font-semibold mt-1 flex items-center gap-1">
+                        <i class="ph-bold ph-trend-up"></i> Setara <span id="b2bKpiTrees">84</span> pohon dewasa ditanam
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+                        <span>Energi Bersih Dipanen (Solar PV)</span>
+                        <span class="w-8 h-8 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center"><i class="ph-fill ph-sun-horizon text-lg"></i></span>
+                    </div>
+                    <p class="font-display font-extrabold text-2xl text-slate-900 mt-2" id="b2bKpiSolar">2.410 kWh</p>
+                    <p class="text-xs text-amber-600 font-semibold mt-1">
+                        Bauran EBT Mandiri: <span id="b2bKpiMix">78% Solar + BESS</span>
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+                        <span>Siklus Baterai Sirkular (SuryaLoop)</span>
+                        <span class="w-8 h-8 rounded-xl bg-teal-100 text-surya-teal flex items-center justify-center"><i class="ph-fill ph-recycle text-lg"></i></span>
+                    </div>
+                    <p class="font-display font-extrabold text-2xl text-slate-900 mt-2" id="b2bKpiLoop">12 Unit Aktif</p>
+                    <p class="text-xs text-slate-500 mt-1">
+                        8 First-Life EV • <strong class="text-surya-teal" id="b2bKpiSecondLife">4 Second-Life BESS</strong>
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-500">
+                        <span>Bagi Hasil Mitra Lokasi (12,5%)</span>
+                        <span class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center"><i class="ph-fill ph-coins text-lg"></i></span>
+                    </div>
+                    <p class="font-display font-extrabold text-2xl text-slate-900 mt-2" id="b2bKpiPartnerRev">Rp 3.450.000<span class="text-xs font-normal text-slate-400">/bln</span></p>
+                    <p class="text-xs text-sky-700 font-semibold mt-1">
+                        Zero CAPEX bagi pemilik properti
+                    </p>
+                </div>
+            </div>
+
+            <!-- SURYALOOP BATTERY CIRCULARITY LIFECYCLE & TELEMETRY MONITOR -->
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-bold uppercase tracking-wider bg-teal-100 text-surya-teal px-2.5 py-0.5 rounded-full">
+                                SuryaLoop Circular Economy Engine
+                            </span>
+                            <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> IoT Telemetry Live
+                            </span>
+                        </div>
+                        <h2 class="font-display font-extrabold text-lg text-slate-900 mt-1">
+                            Manajemen Siklus Hidup Baterai Terpadu (First-Life EV &rarr; Second-Life BESS)
+                        </h2>
+                        <p class="text-xs text-slate-500">
+                            Baterai kendaraan yang kesehatannya (State of Health / SoH) turun mendekati &le;80% tidak dibuang, melainkan dialihfungsikan menjadi unit penyimpanan surya stasiun.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="text-xs bg-amber-50 border border-amber-300 text-amber-800 px-3 py-1.5 rounded-xl font-semibold">
+                            <i class="ph-bold ph-warning-circle mr-1"></i>
+                            <span id="repurposeAlertCount">1</span> Baterai Siap Repurpose ke BESS
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Battery Telemetry Grid -->
+                <div id="batteryLifecycleGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- FINANCIAL & AMENITY PARTNERSHIP SIMULATOR (Page 14 & 24 Proposal Data) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Interactive Calculator -->
+                <div class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-5">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">
+                            Simulasi Finansial &amp; BEP Proposal (Halaman 14 &amp; 24)
+                        </span>
+                        <h3 class="font-display font-extrabold text-lg text-slate-900 mt-1">
+                            Kalkulator Proyeksi Pendapatan Stasiun &amp; Bagi Hasil Mitra
+                        </h3>
+                    </div>
+
+                    <div class="space-y-4 text-xs">
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span class="text-slate-700">Jumlah Stasiun Aktif (Ekspansi Pilot Bandung Raya):</span>
+                                <span class="text-surya-teal font-extrabold" id="calcStationLabel">1 Stasiun Hub (MVP Awal)</span>
+                            </div>
+                            <input type="range" id="calcStations" min="1" max="5" value="1" oninput="runFinancialCalc()" class="w-full accent-surya-teal cursor-pointer">
+                            <div class="flex justify-between text-[10px] text-slate-400">
+                                <span>1 Titik (MVP Bulan 1)</span>
+                                <span>3 Titik (Bulan 6)</span>
+                                <span>5 Titik (Target SOM)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span class="text-slate-700">Rata-rata Penukaran Baterai Harian per Stasiun:</span>
+                                <span class="text-emerald-700 font-extrabold"><span id="calcSwapsLabel">35</span> Swap / hari</span>
+                            </div>
+                            <input type="range" id="calcSwaps" min="15" max="80" value="35" oninput="runFinancialCalc()" class="w-full accent-emerald-600 cursor-pointer">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-bold mb-1">
+                                <span class="text-slate-700">Utilisasi AC Wallbox 7,4 kW (Destination Charging):</span>
+                                <span class="text-amber-700 font-extrabold"><span id="calcAcHoursLabel">8</span> Jam / hari</span>
+                            </div>
+                            <input type="range" id="calcAcHours" min="2" max="20" value="8" oninput="runFinancialCalc()" class="w-full accent-amber-500 cursor-pointer">
+                        </div>
+                    </div>
+
+                    <!-- Calculated Output Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
+                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                            <p class="text-[11px] text-slate-500">Pendapatan Kotor / Bln</p>
+                            <p class="font-display font-extrabold text-base text-slate-900 mt-0.5" id="calcGrossRev">Rp 11.910.000</p>
+                            <p class="text-[10px] text-emerald-600 font-medium">Swap + AC + SaaS ESG</p>
+                        </div>
+                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+                            <p class="text-[11px] text-slate-500">Bagi Hasil Mitra (12,5%)</p>
+                            <p class="font-display font-extrabold text-base text-sky-700 mt-0.5" id="calcPartnerShare">Rp 1.488.750</p>
+                            <p class="text-[10px] text-slate-500">Amenity Partner Share</p>
+                        </div>
+                        <div class="bg-emerald-50 p-3.5 rounded-xl border border-emerald-200 col-span-2 sm:col-span-1">
+                            <p class="text-[11px] text-emerald-800">Laba Bersih Operasional</p>
+                            <p class="font-display font-extrabold text-base text-emerald-700 mt-0.5" id="calcNetProfit">Rp 6.421.250</p>
+                            <p class="text-[10px] text-emerald-700 font-semibold" id="calcBepEstimate">Estimasi BEP: ~16 Bulan</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proposal Financial Benchmark Table (Page 14 & 24) -->
+                <div class="lg:col-span-5 bg-surya-teal text-white rounded-2xl p-6 shadow-md flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-white/15 px-2.5 py-0.5 rounded-full text-amber-300">
+                                Data Resmi Proposal RAB 2026
+                            </span>
+                            <i class="ph-fill ph-chart-line-up text-xl text-emerald-300"></i>
+                        </div>
+                        <h3 class="font-display font-bold text-base">
+                            Ringkasan Konsolidasi Keuangan (Tahun 1 - Tahun 3)
+                        </h3>
+
+                        <div class="space-y-2 text-xs pt-1">
+                            <div class="flex justify-between py-1.5 border-b border-white/10">
+                                <span class="text-teal-100">CAPEX MVP Awal (1 Hub Lengkap):</span>
+                                <span class="font-bold">Rp 80 Jt – Rp 110 Jt</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-white/10">
+                                <span class="text-teal-100">OPEX Bulanan (Pemeliharaan &amp; Cloud):</span>
+                                <span class="font-bold">Rp 3,5 Jt – Rp 5 Jt / bln</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-white/10">
+                                <span class="text-teal-100">Target Pendapatan Bulan ke-1:</span>
+                                <span class="font-bold text-emerald-300">Rp 7,5 Jt – Rp 10 Jt</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-white/10">
+                                <span class="text-teal-100">Target Pendapatan Bulan ke-6:</span>
+                                <span class="font-bold text-amber-300">Rp 25 Jt – Rp 35 Jt</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-white/10">
+                                <span class="text-teal-100">Laba Operasional (EBIT) Tahun 1:</span>
+                                <span class="font-bold">Rp 102.000.000</span>
+                            </div>
+                            <div class="flex justify-between py-1.5 border-b border-white/10">
+                                <span class="text-teal-100">Laba Operasional (EBIT) Tahun 2:</span>
+                                <span class="font-bold">Rp 300.000.000</span>
+                            </div>
+                            <div class="flex justify-between py-1.5">
+                                <span class="text-teal-100">NPV (Discount Rate 12% - 36 Bln):</span>
+                                <span class="font-bold text-emerald-300">Rp 704.520.000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-black/25 p-3.5 rounded-xl border border-white/10 text-[11px] text-teal-100">
+                        <strong class="text-white">Mitigasi Hukum ESDM:</strong> Pendapatan ditagihkan sebagai <em>Biaya Jasa Fasilitas Layanan (Service Fee)</em>, sewa baterai armada, dan lisensi SaaS SuryaESG.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================================= -->
+        <!-- MODE 3: SURYA DAYA STATION HUB 24/7 HARDWARE SIMULATOR (IOT CABINET)    -->
+        <!-- ======================================================================= -->
+        <section id="view-iot" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-6">
+                <!-- Header & Weather / Solar Simulator Controls -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">
+                            24/7 Unmanned Modular Station Simulator
+                        </span>
+                        <h1 class="font-display font-extrabold text-xl sm:text-2xl text-slate-900 mt-1">
+                            Surya Daya Station Hub — Smart Energy Management System (SEMS)
+                        </h1>
+                        <p class="text-xs text-slate-500">
+                            Simulasi perangkat keras stasiun percontohan: <strong>Panel Surya Atap (Solar PV)</strong> + <strong>SuryaLoop Second-Life BESS</strong> + <strong>8-Slot Swapping Cabinet</strong> + <strong>2x AC Wallbox 7,4 kW</strong>.
+                        </p>
+                    </div>
+
+                    <!-- Weather & Hybrid Grid Switcher (Mitigasi Risiko SWOT Hal. 21) -->
+                    <div class="flex flex-wrap items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200">
+                        <span class="text-[11px] font-bold text-slate-600 px-2">Simulasi Cuaca (SWOT):</span>
+                        <button onclick="setStationWeather('sunny')" id="weatherBtn-sunny" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1">
+                            <i class="ph-fill ph-sun"></i> Terik (100% Solar PV)
+                        </button>
+                        <button onclick="setStationWeather('cloudy')" id="weatherBtn-cloudy" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-white flex items-center gap-1">
+                            <i class="ph-fill ph-cloud-sun"></i> Mendung (Solar + BESS)
+                        </button>
+                        <button onclick="setStationWeather('rainy')" id="weatherBtn-rainy" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-white flex items-center gap-1">
+                            <i class="ph-fill ph-cloud-rain"></i> Hujan/Malam (BESS + Hibrida PLN)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3-COLUMN INTERACTIVE HARDWARE ARCHITECTURE -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+
+                    <!-- Col 1: Solar PV Canopy & Second-Life BESS Storage (4 cols) -->
+                    <div class="lg:col-span-4 bg-slate-900 text-white rounded-2xl p-5 flex flex-col justify-between space-y-5 border border-slate-800">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-400 bg-amber-400/10 border border-amber-400/30 px-2.5 py-0.5 rounded-full">
+                                    Hulu Energi Bersih
+                                </span>
+                                <span class="text-xs font-mono text-emerald-400" id="iotSolarOutputText">4.8 kW Output</span>
+                            </div>
+
+                            <!-- Solar Roof Visual -->
+                            <div class="bg-slate-800/90 rounded-xl p-4 border border-slate-700 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i class="ph-fill ph-sun text-2xl text-amber-400" id="iotSunIcon"></i>
+                                        <div>
+                                            <h3 class="font-display font-bold text-sm">Kanopi PLTS Atap (Solar PV)</h3>
+                                            <p class="text-[11px] text-slate-400" id="iotWeatherDesc">Irradiance Optimal • Zero Emission</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Solar Panel Grid Graphic -->
+                                <div class="grid grid-cols-4 gap-1.5 pt-2">
+                                    <div class="h-8 rounded bg-gradient-to-br from-sky-600 to-blue-900 border border-sky-400/40"></div>
+                                    <div class="h-8 rounded bg-gradient-to-br from-sky-600 to-blue-900 border border-sky-400/40"></div>
+                                    <div class="h-8 rounded bg-gradient-to-br from-sky-600 to-blue-900 border border-sky-400/40"></div>
+                                    <div class="h-8 rounded bg-gradient-to-br from-sky-600 to-blue-900 border border-sky-400/40"></div>
+                                </div>
+                            </div>
+
+                            <!-- Downward Energy Flow Indicator -->
+                            <div class="flex items-center justify-center gap-2 text-xs text-emerald-400 font-mono py-1">
+                                <i class="ph-bold ph-arrow-down animate-bounce"></i>
+                                <span id="iotFlowStatus">Mengisi BESS &amp; Rak Baterai</span>
+                                <i class="ph-bold ph-arrow-down animate-bounce"></i>
+                            </div>
+
+                            <!-- SuryaLoop Second-Life BESS Unit -->
+                            <div class="bg-slate-800/90 rounded-xl p-4 border border-emerald-500/40 space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <span class="text-[10px] font-bold uppercase text-emerald-400">SuryaLoop Circular Storage</span>
+                                        <h3 class="font-display font-bold text-sm">Second-Life BESS (20 kWh)</h3>
+                                    </div>
+                                    <span class="font-mono font-extrabold text-lg text-emerald-400" id="iotBessPct">92%</span>
+                                </div>
+                                <div class="w-full h-3 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-700">
+                                    <div id="iotBessBar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-500" style="width: 92%"></div>
+                                </div>
+                                <p class="text-[11px] text-slate-300 leading-relaxed">
+                                    Disusun dari <strong id="iotRepurposedCount">4 modul baterai eks-armada</strong> (SoH 72%-79%) yang dialihfungsikan. Menjamin <strong>Zero Downtime 24/7</strong> saat cuaca mendung/malam.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-black/30 rounded-xl p-3 border border-white/10 text-[11px] text-slate-400 flex items-center justify-between">
+                            <span>Cadangan Grid Hibrida:</span>
+                            <span class="font-bold text-emerald-400" id="iotGridStatus">Standby (Hemat Biaya PLN)</span>
+                        </div>
+                    </div>
+
+                    <!-- Col 2: 8-Slot Modular Swapping Cabinet (5 cols) -->
+                    <div class="lg:col-span-5 bg-gradient-to-b from-surya-teal to-surya-dark text-white rounded-2xl p-5 border-2 border-teal-500/30 shadow-xl flex flex-col justify-between space-y-4">
+                        <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                            <div>
+                                <span class="text-[10px] font-extrabold uppercase tracking-wider bg-emerald-400 text-slate-950 px-2 py-0.5 rounded">
+                                    Swapping Cabinet Modular (&lt;2 Menit)
+                                </span>
+                                <h3 class="font-display font-extrabold text-base mt-1">
+                                    8-Slot Smart Battery Rack • Hub UT Bandung
+                                </h3>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-teal-200 block">Stok Siap Pakai</span>
+                                <span class="font-mono font-extrabold text-lg text-emerald-300" id="cabinetReadyCount">6 / 8 Slot</span>
+                            </div>
+                        </div>
+
+                        <!-- 8 Battery Slots Visual Grid -->
+                        <div id="hardwareCabinetSlots" class="grid grid-cols-2 gap-3">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+
+                        <!-- Cabinet Kiosk Touch Screen Simulation -->
+                        <div class="bg-slate-950/80 rounded-xl p-3.5 border border-white/15 flex items-center justify-between gap-3">
+                            <div class="space-y-0.5">
+                                <p class="text-[10px] font-bold uppercase text-amber-300">Layar Kiosk Stasiun Mandiri</p>
+                                <p class="text-xs text-white font-medium" id="kioskScreenText">Siap melayani. Pindai QR dari aplikasi SuryaGo.</p>
+                            </div>
+                            <button onclick="simulateInstantSwap()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-3.5 py-2 rounded-lg shrink-0 transition shadow">
+                                Test Swap Kilat
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Col 3: 2x AC Wallbox 7.4 kW Destination Chargers (3 cols) -->
+                    <div class="lg:col-span-3 bg-slate-50 rounded-2xl p-5 border border-slate-200 flex flex-col justify-between space-y-4">
+                        <div class="space-y-3">
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-sky-100 text-sky-800 px-2.5 py-0.5 rounded-full">
+                                Destination Charging
+                            </span>
+                            <h3 class="font-display font-extrabold text-base text-slate-900">
+                                2x AC Wallbox Charger (7,4 kW)
+                            </h3>
+                            <p class="text-xs text-slate-500">
+                                Untuk mahasiswa, komuter harian, &amp; pengunjung kafe yang mengisi daya sambil beraktivitas (Rp 4.000/jam).
+                            </p>
+
+                            <!-- Port AC-01 -->
+                            <div class="bg-white rounded-xl p-3.5 border-2 border-emerald-500 shadow-sm space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-display font-bold text-xs text-slate-900">Wallbox Port #AC-01</span>
+                                    <span id="acPort1Badge" class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">Tersedia</span>
+                                </div>
+                                <p class="text-[11px] text-slate-500" id="acPort1Info">Daya: 7,4 kW Type-2 / Plug-in EV</p>
+                                <button onclick="toggleAcWallbox(1)" id="acPort1Btn" class="w-full bg-surya-teal hover:bg-surya-dark text-white text-xs font-bold py-2 rounded-lg transition">
+                                    Mulai Charging (Simulasi)
+                                </button>
+                            </div>
+
+                            <!-- Port AC-02 -->
+                            <div class="bg-white rounded-xl p-3.5 border border-slate-200 shadow-sm space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-display font-bold text-xs text-slate-900">Wallbox Port #AC-02</span>
+                                    <span id="acPort2Badge" class="text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">Sedang Mengisi</span>
+                                </div>
+                                <p class="text-[11px] text-slate-600" id="acPort2Info">Alva One • 45 Menit berjalan (3,2 kWh)</p>
+                                <button onclick="toggleAcWallbox(2)" id="acPort2Btn" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold py-2 rounded-lg transition">
+                                    Hentikan &amp; Cetak Resi
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="bg-teal-50 p-3 rounded-xl border border-teal-200 text-[11px] text-surya-teal">
+                            <i class="ph-fill ph-check-circle mr-1"></i>
+                            <strong>Multi-Segmen:</strong> Melayani roda 2 (motor pribadi non-swap) maupun roda 4 di lokasi mitra.
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ======================================================================= -->
+    <!-- MODALS: SMART BOOKING, DIGITAL RECEIPT, SURI GUIDE, ESG REPORT, TEAM    -->
+    <!-- ======================================================================= -->
+
+    <!-- 1. STATION DETAIL & SMART BOOKING MODAL -->
+    <div id="bookingModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-start justify-between border-b border-slate-100 pb-3">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-teal-100 text-surya-teal px-2.5 py-0.5 rounded-full">
+                        Smart Booking 10–15 Menit
+                    </span>
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mt-1" id="modalStName">
+                        Surya Daya Station Hub
+                    </h3>
+                    <p class="text-xs text-slate-500" id="modalStAddress">Kawasan Kampus UT Bandung • 2,3 km dari posisimu</p>
+                </div>
+                <button onclick="closeModal('bookingModal')" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <!-- Choose Service Type -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700">1. Pilih Layanan Fasilitas</label>
+                <div class="grid grid-cols-2 gap-2.5 text-xs">
+                    <button type="button" onclick="selectModalService('swap')" id="srvBtn-swap" class="p-3 rounded-xl border-2 border-surya-teal bg-teal-50/60 text-left transition">
+                        <div class="flex items-center justify-between font-bold text-surya-teal">
+                            <span>Tukar Baterai</span>
+                            <i class="ph-fill ph-lightning"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-600 mt-1">Kilat &lt;2 Menit • Kunci 1 slot penuh 100%</p>
+                    </button>
+                    <button type="button" onclick="selectModalService('ac')" id="srvBtn-ac" class="p-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-left transition">
+                        <div class="flex items-center justify-between font-bold text-slate-800">
+                            <span>AC Wallbox 7,4kW</span>
+                            <i class="ph-fill ph-plug-charging"></i>
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">Destination Charging di lokasi singgah</p>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Choose Tariff / Promo Voucher -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700">2. Skema Biaya Jasa Fasilitas (Service Fee)</label>
+                <select id="modalTariffSelect" class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-semibold text-slate-800">
+                    <option value="free">🎁 Voucher Pengguna Baru — Gratis 1x Swap Pertama (Rp 0)</option>
+                    <option value="swap9k">⚡ Pay-Per-Swap Reguler — Rp 9.000 / penukaran</option>
+                    <option value="sub">📦 Potong Kuota Langganan Armada (Rp 200.000/bln)</option>
+                    <option value="ac4k">🔌 Jasa Fasilitas AC Wallbox 7,4 kW — Rp 4.000 / jam</option>
+                </select>
+            </div>
+
+            <!-- Choose Payment Gateway (SNAP BI) -->
+            <div class="space-y-2">
+                <label class="block text-xs font-bold text-slate-700">3. Metode Pembayaran Nontunai (SNAP Bank Indonesia)</label>
+                <div class="grid grid-cols-4 gap-2 text-[11px] font-bold">
+                    <button type="button" onclick="selectPayment('QRIS SNAP BI')" class="pay-opt-btn py-2 px-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800">QRIS</button>
+                    <button type="button" onclick="selectPayment('GoPay')" class="pay-opt-btn py-2 px-2 rounded-xl border border-slate-200 text-slate-700">GoPay</button>
+                    <button type="button" onclick="selectPayment('OVO / DANA')" class="pay-opt-btn py-2 px-2 rounded-xl border border-slate-200 text-slate-700">DANA/OVO</button>
+                    <button type="button" onclick="selectPayment('VA Bank')" class="pay-opt-btn py-2 px-2 rounded-xl border border-slate-200 text-slate-700">Virtual Acc</button>
+                </div>
+            </div>
+
+            <!-- ESG & Legal Compliance Notice -->
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-[11px] text-emerald-900 space-y-1">
+                <div class="font-bold flex items-center gap-1">
+                    <i class="ph-fill ph-leaf text-emerald-600"></i>
+                    <span>Estimasi Dampak: +1,2 kg CO₂ Dihemat (100% Energi Surya)</span>
+                </div>
+                <p class="text-emerald-700">
+                    Baterai dikunci khusus untuk Anda selama <strong>15 menit</strong> sehingga bebas risiko antrean atau kehabisan stok.
+                </p>
+            </div>
+
+            <div class="pt-2 flex gap-2">
+                <button onclick="closeModal('bookingModal')" class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100">
+                    Batal
+                </button>
+                <button onclick="confirmSmartBooking()" class="flex-1 bg-surya-teal hover:bg-surya-dark text-white font-display font-bold text-xs py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center gap-1.5">
+                    <i class="ph-bold ph-lock-key"></i>
+                    <span>Kunci Stok Sekarang (15 Menit)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. DIGITAL RECEIPT & PERSONAL CARBON OFFSET MODAL -->
+    <div id="receiptModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4 text-center relative overflow-hidden">
+            <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-sm">
+                <i class="ph-fill ph-check-circle text-4xl"></i>
+            </div>
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-widest bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full">
+                    Penukaran Selesai dalam 78 Detik!
+                </span>
+                <h3 class="font-display font-extrabold text-lg text-slate-900 mt-1">
+                    Resi Digital &amp; Laporan Karbon
+                </h3>
+                <p class="text-xs text-slate-500" id="rcpTimestamp">31 Okt 2026 • ID: SD-TX88291</p>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 text-left space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Lokasi Stasiun:</span>
+                    <span class="font-bold text-slate-900" id="rcpStation">Surya Daya Station Hub</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Baterai Diterima:</span>
+                    <span class="font-bold text-emerald-700" id="rcpBattery">Slot #04 (SoC 100% • SoH 98%)</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Sumber Energi:</span>
+                    <span class="font-semibold text-amber-600">Solar PV + SuryaLoop BESS</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500">Biaya Jasa Fasilitas:</span>
+                    <span class="font-extrabold text-slate-900" id="rcpAmount">Rp 0 (Voucher Free Swap)</span>
+                </div>
+                <div class="pt-2 border-t border-dashed border-slate-300 flex justify-between items-center">
+                    <span class="font-bold text-emerald-800">Reduksi Emisi Karbon:</span>
+                    <span class="font-display font-extrabold text-sm bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-lg" id="rcpCarbon">-1,2 kg CO₂e</span>
+                </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500">
+                Data transaksi ini otomatis tercatat di <strong>SuryaESG Dashboard</strong> mitra lokasi untuk mendukung sertifikasi Green Campus/Building.
+            </p>
+
+            <div class="flex gap-2">
+                <button onclick="closeModal('receiptModal'); switchAppTab('aktivitas');" class="flex-1 bg-surya-teal hover:bg-surya-dark text-white text-xs font-bold py-2.5 rounded-xl transition">
+                    Lihat Riwayat Aktivitas
+                </button>
+                <button onclick="closeModal('receiptModal')" class="px-4 py-2.5 rounded-xl bg-slate-100 text-xs font-bold text-slate-700">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. SURI MASCOT INTERACTIVE GUIDE MODAL -->
+    <div id="suriModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-amber-400 flex items-center justify-center text-slate-900 font-bold text-xl">
+                        ☀️
+                    </div>
+                    <div>
+                        <h3 class="font-display font-extrabold text-base text-slate-900">Halo! Aku SURI (Si Surya Cilik)</h3>
+                        <p class="text-xs text-slate-500">Duta Energi Terbarukan Surya Daya</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('suriModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="bg-teal-50/70 border border-teal-200 rounded-2xl p-4 space-y-2.5 text-xs text-slate-700 leading-relaxed">
+                <p>
+                    <strong>Mengapa harus pakai Surya Daya?</strong> Selama ini teman-teman pengemudi ojol, kurir logistik, dan mahasiswa harus menunggu <strong>2–4 jam</strong> untuk ngecas motor listrik, dan listriknya masih dari batu bara.
+                </p>
+                <ul class="space-y-1.5 list-disc list-inside text-slate-800 font-medium">
+                    <li><strong>Smart Booking 15 Menit:</strong> Kunci baterai penuh dari HP sebelum sampai di stasiun.</li>
+                    <li><strong>Tukar Kilat &lt;2 Menit:</strong> Langsung jalan lagi, produktivitas harian naik!</li>
+                    <li><strong>100% Energi Matahari:</strong> Ditenagai Solar PV &amp; baterai sirkular <em>SuryaLoop</em>.</li>
+                </ul>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-300 rounded-xl p-3 flex items-center justify-between">
+                <div class="text-xs">
+                    <p class="font-bold text-amber-900">Promo 100 Innovators Pertama!</p>
+                    <p class="text-[11px] text-amber-800">Gratis 1x biaya jasa penukaran baterai + Stiker Reflektif.</p>
+                </div>
+                <button onclick="closeModal('suriModal'); openBookingModal(1);" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold text-xs px-3 py-2 rounded-lg shrink-0">
+                    Pakai Voucher
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. OFFICIAL B2B ESG COMPLIANCE CERTIFICATE & AUDIT MODAL -->
+    <div id="esgReportModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border-2 border-emerald-600 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-start justify-between border-b border-slate-200 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-surya-teal text-white flex items-center justify-center">
+                        <i class="ph-fill ph-seal-check text-3xl text-emerald-300"></i>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-700">SuryaESG Automated Reporting</span>
+                        <h3 class="font-display font-extrabold text-lg text-slate-900">
+                            Laporan Kepatuhan ESG &amp; Jejak Karbon Mitra
+                        </h3>
+                        <p class="text-xs text-slate-500">Dokumen Pendukung Green Campus / Green Building Audit</p>
+                    </div>
+                </div>
+                <button onclick="closeModal('esgReportModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <span class="text-slate-400 block">Nama Institusi Mitra:</span>
+                        <strong class="text-slate-900" id="esgCertPartner">Universitas Terbuka Bandung</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Periode Audit Real-Time:</span>
+                        <strong class="text-slate-900">Kuartal IV - Oktober 2026</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Skema Kerja Sama:</span>
+                        <strong class="text-emerald-700">Amenity Partnership (Zero CAPEX)</strong>
+                    </div>
+                    <div>
+                        <span class="text-slate-400 block">Verifikasi Telemetri:</span>
+                        <strong class="text-surya-teal">SEMS IoT Cloud Encrypted (SSL/TLS)</strong>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 pt-3 grid grid-cols-3 gap-2 text-center">
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                        <p class="text-[10px] text-slate-500">Scope 2 &amp; 3 Offset</p>
+                        <p class="font-display font-extrabold text-sm text-emerald-700 mt-0.5">1.842,6 kg CO₂e</p>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                        <p class="text-[10px] text-slate-500">Energi Surya Mandiri</p>
+                        <p class="font-display font-extrabold text-sm text-amber-600 mt-0.5">2.410 kWh</p>
+                    </div>
+                    <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                        <p class="text-[10px] text-slate-500">Baterai Didaur Ulang</p>
+                        <p class="font-display font-extrabold text-sm text-surya-teal mt-0.5">4 Unit BESS</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="window.print()" class="bg-surya-teal hover:bg-surya-dark text-white text-xs font-bold px-4 py-2.5 rounded-xl flex items-center gap-1.5">
+                    <i class="ph-bold ph-printer"></i> Cetak / Simpan PDF
+                </button>
+                <button onclick="closeModal('esgReportModal')" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. TEAM & PROPOSAL SUMMARY MODAL -->
+    <div id="teamModal" class="fixed inset-0 z-50 hidden bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2.5 py-0.5 rounded-full">
+                        Identitas Tim Pengusul • Business Plan 2026
+                    </span>
+                    <h3 class="font-display font-extrabold text-lg text-slate-900 mt-1">
+                        SURYA DAYA — Universitas Terbuka Bandung
+                    </h3>
+                </div>
+                <button onclick="closeModal('teamModal')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div class="space-y-2.5 text-xs">
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-surya-teal uppercase">Hustler • Ketua Tim / Project Lead</span>
+                        <p class="font-bold text-slate-900 text-sm">Chindy Citra Ayu Anggraeni</p>
+                        <p class="text-slate-500">NIM: 050626295 • Ilmu Komunikasi (Strategic B2B &amp; ESG Narrative)</p>
+                    </div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-emerald-700 uppercase">Hacker/Strategist • Business Development</span>
+                        <p class="font-bold text-slate-900 text-sm">Maulana Rizki Fadhilah</p>
+                        <p class="text-slate-500">NIM: 056857455 • Manajemen (Riset Pasar, Finansial &amp; Kompetitor)</p>
+                    </div>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold text-amber-600 uppercase">Hipster • Creative &amp; UI/UX Designer</span>
+                        <p class="font-bold text-slate-900 text-sm">Deristo</p>
+                        <p class="text-slate-500">NIM: 053314364 • Manajemen (Desain UI/UX SuryaGo &amp; Digital Marketing)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="closeModal('teamModal')" class="bg-surya-teal text-white text-xs font-bold px-4 py-2 rounded-xl">
+                    Mengerti
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- ======================================================================= -->
+    <!-- APPLICATION JAVASCRIPT ENGINE                                           -->
+    <!-- ======================================================================= -->
+    <script>
+        // --- 1. CENTRALIZED STATE & PROPOSAL DATA ---
+        const state = {
+            currentMainMode: 'b2c',
+            currentAppTab: 'beranda',
+            stationFilter: 'all',
+            activityFilter: 'all',
+            selectedStationId: 1,
+            selectedService: 'swap',
+            selectedPayment: 'QRIS SNAP BI',
+            hasFreeVoucher: true,
+            userCarbonKg: 14.8,
+            userMoneySaved: 142000,
+            bookingActive: false,
+            bookingSecondsLeft: 900, // 15 minutes
+            bookingInterval: null,
+            weather: 'sunny',
+            acPorts: {
+                1: { busy: false, info: 'Daya: 7,4 kW Type-2 / Plug-in EV' },
+                2: { busy: true, info: 'Alva One • 45 Menit berjalan (3,2 kWh)' }
+            },
+            // Stations in Bandung Raya (Directly matching Page 9 & 25 of Proposal)
+            stations: [
+                {
+                    id: 1,
+                    name: 'Surya Daya Station Hub',
+                    area: 'Kampus UT Bandung / Cibiru',
+                    distanceKm: 2.3,
+                    batteriesReady: 8,
+                    acSlotsReady: 2,
+                    isOpen: true,
+                    solarActive: true,
+                    tag: 'Pilot Hub Utama'
+                },
+                {
+                    id: 2,
+                    name: 'Surya Daya Dago',
+                    area: 'Kafe & Co-Working Dago Atas',
+                    distanceKm: 4.8,
+                    batteriesReady: 4,
+                    acSlotsReady: 1,
+                    isOpen: true,
+                    solarActive: true,
+                    tag: 'Amenity Partner'
+                },
+                {
+                    id: 4,
+                    name: 'Surya Daya Dipatiukur',
+                    area: 'Parkir & Kantin Mahasiswa DU',
+                    distanceKm: 3.1,
+                    batteriesReady: 6,
+                    acSlotsReady: 2,
+                    isOpen: true,
+                    solarActive: true,
+                    tag: 'Koridor Kampus'
+                },
+                {
+                    id: 3,
+                    name: 'Surya Daya Asia Afrika',
+                    area: 'Kawasan Komersial Braga/AA',
+                    distanceKm: 6.1,
+                    batteriesReady: 0,
+                    acSlotsReady: 2,
+                    isOpen: false,
+                    solarActive: false,
+                    tag: 'Hanya AC Charging'
+                }
+            ],
+            // Activity History (Matching Page 25 Proposal Screenshot)
+            activities: [
+                {
+                    id: 'SD-TX88210',
+                    station: 'Surya Daya Station Hub',
+                    date: '18 Okt 2026',
+                    type: 'swap',
+                    label: 'Tukar Baterai (<2 Menit)',
+                    fee: 'Rp 9.000',
+                    carbonKg: 1.2
+                },
+                {
+                    id: 'SD-TX88145',
+                    station: 'Surya Daya Dago',
+                    date: '14 Okt 2026',
+                    type: 'charging',
+                    label: 'AC Wallbox Charging (2 Jam)',
+                    fee: 'Rp 8.000',
+                    carbonKg: 2.1
+                },
+                {
+                    id: 'SD-TX87990',
+                    station: 'Surya Daya Dipatiukur',
+                    date: '10 Okt 2026',
+                    type: 'swap',
+                    label: 'Tukar Baterai (<2 Menit)',
+                    fee: 'Rp 9.000',
+                    carbonKg: 1.2
+                }
+            ],
+            // SuryaLoop Battery Telemetry (First-Life EV vs Second-Life BESS)
+            batteries: [
+                { id: 'BAT-SD01', slot: 'Slot #01', soc: 100, soh: 99, temp: 29, cycles: 42, stage: 'first-life', status: 'Siap Tukar' },
+                { id: 'BAT-SD02', slot: 'Slot #02', soc: 100, soh: 96, temp: 30, cycles: 88, stage: 'first-life', status: 'Siap Tukar' },
+                { id: 'BAT-SD03', slot: 'Slot #03', soc: 64,  soh: 94, temp: 33, cycles: 120, stage: 'first-life', status: 'Mengisi Surya' },
+                { id: 'BAT-SD04', slot: 'Slot #04', soc: 100, soh: 98, temp: 28, cycles: 55, stage: 'first-life', status: 'Siap Tukar' },
+                { id: 'BAT-SD05', slot: 'Slot #05', soc: 100, soh: 91, temp: 30, cycles: 190, stage: 'first-life', status: 'Siap Tukar' },
+                { id: 'BAT-SD06', slot: 'Slot #06', soc: 100, soh: 79, temp: 34, cycles: 510, stage: 'repurpose-ready', status: 'SoH <80% (Alihkan)' },
+                { id: 'BAT-SD07', slot: 'BESS #A1', soc: 95,  soh: 76, temp: 27, cycles: 620, stage: 'second-life', status: 'Second-Life BESS' },
+                { id: 'BAT-SD08', slot: 'BESS #A2', soc: 92,  soh: 74, temp: 27, cycles: 685, stage: 'second-life', status: 'Second-Life BESS' }
+            ]
+        };
+
+        // --- 2. MODE & TAB NAVIGATION ---
+        function switchMainMode(mode) {
+            state.currentMainMode = mode;
+            ['b2c', 'b2b', 'iot'].forEach(m => {
+                const section = document.getElementById(`view-${m}`);
+                const btn = document.getElementById(`modeBtn-${m}`);
+                if (m === mode) {
+                    section.classList.remove('hidden');
+                    btn.className = 'mode-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-emerald-500 text-white shadow';
+                } else {
+                    section.classList.add('hidden');
+                    btn.className = 'mode-tab flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all text-teal-100 hover:text-white';
+                }
+            });
+            if (mode === 'b2b') {
+                renderBatteryLifecycleGrid();
+                runFinancialCalc();
+            }
+            if (mode === 'iot') {
+                renderHardwareCabinet();
+            }
+        }
+
+        function switchAppTab(tabName) {
+            state.currentAppTab = tabName;
+            ['beranda', 'booking', 'aktivitas', 'profil'].forEach(t => {
+                const content = document.getElementById(`appTab-${t}`);
+                const navBtn = document.getElementById(`navTab-${t}`);
+                if (t === tabName) {
+                    content.classList.remove('hidden');
+                    navBtn.classList.remove('text-slate-400', 'font-medium');
+                    navBtn.classList.add('text-surya-teal', 'font-bold');
+                } else {
+                    content.classList.add('hidden');
+                    navBtn.classList.add('text-slate-400', 'font-medium');
+                    navBtn.classList.remove('text-surya-teal', 'font-bold');
+                }
+            });
+            document.getElementById('appScrollContainer').scrollTop = 0;
+        }
+
+        function togglePhoneExpand() {
+            const frame = document.getElementById('phoneFrame');
+            const btn = document.getElementById('expandPhoneBtn');
+            frame.classList.toggle('expanded');
+            const isExpanded = frame.classList.contains('expanded');
+            btn.innerHTML = isExpanded
+                ? '<i class="ph-bold ph-device-mobile"></i><span>Mode HP Standar</span>'
+                : '<i class="ph-bold ph-arrows-out-simple"></i><span>Perlebar Layar</span>';
+        }
+
+        // --- 3. STATION LIST & FILTERING (SURYAGO BERANDA) ---
+        function setStationFilter(filter) {
+            state.stationFilter = filter;
+            document.querySelectorAll('.st-filter-btn').forEach(btn => {
+                if (btn.dataset.filter === filter) {
+                    btn.className = 'st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-surya-teal bg-teal-50 text-surya-teal transition';
+                } else {
+                    btn.className = 'st-filter-btn px-3 py-1 rounded-full text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition';
+                }
+            });
+            renderStationCards();
+        }
+
+        function renderStationCards() {
+            const query = (document.getElementById('stationSearchInput')?.value || '').toLowerCase();
+            const container = document.getElementById('stationListContainer');
+            if (!container) return;
+
+            const filtered = state.stations.filter(st => {
+                const matchesSearch = st.name.toLowerCase().includes(query) || st.area.toLowerCase().includes(query);
+                if (!matchesSearch) return false;
+                if (state.stationFilter === 'near') return st.distanceKm <= 5.0;
+                if (state.stationFilter === 'open') return st.isOpen;
+                if (state.stationFilter === 'swap') return st.batteriesReady > 0;
+                if (state.stationFilter === 'charging') return st.acSlotsReady > 0;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-6 text-center border border-slate-200 text-xs text-slate-500">
+                        Tidak ada stasiun yang sesuai dengan filter pencarian.
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(st => {
+                const statusBadge = st.isOpen
+                    ? `<span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">&bull; Buka &bull; Solar Aktif</span>`
+                    : `<span class="text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">&bull; Tutup Swap &bull; AC Ready</span>`;
+
+                return `
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/90 hover:border-surya-teal transition space-y-2.5">
+                    <div class="flex items-start justify-between gap-2">
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <h4 class="font-display font-bold text-sm text-slate-900">${st.name}</h4>
+                            </div>
+                            <p class="text-[11px] text-slate-500">${st.area}</p>
+                        </div>
+                        ${statusBadge}
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2 text-xs text-slate-700 font-medium pt-0.5">
+                        <span class="bg-slate-100 px-2 py-0.5 rounded-md"><i class="ph-bold ph-navigation-arrow mr-1 text-surya-teal"></i>${st.distanceKm.toString().replace('.', ',')} km</span>
+                        <span class="bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md font-semibold"><i class="ph-fill ph-battery-charging mr-1"></i>0${st.batteriesReady} baterai siap</span>
+                        <span class="bg-sky-50 text-sky-800 px-2 py-0.5 rounded-md font-semibold"><i class="ph-fill ph-plug-charging mr-1"></i>0${st.acSlotsReady} slot AC (7,4 kW)</span>
+                    </div>
+
+                    <div class="pt-1 flex items-center justify-between">
+                        <button onclick="openBookingModal(${st.id})" class="inline-flex items-center gap-1.5 bg-teal-50 hover:bg-surya-teal text-surya-teal hover:text-white font-bold text-xs px-3.5 py-2 rounded-xl border border-teal-200 transition">
+                            <span>Lihat Detail &amp; Smart Booking</span>
+                            <i class="ph-bold ph-arrow-right"></i>
+                        </button>
+                        <span class="text-[10px] font-semibold text-slate-400">${st.tag}</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // --- 4. SMART BOOKING & 15-MINUTE LOCK TIMER ---
+        function openBookingModal(stationId) {
+            const st = state.stations.find(s => s.id === stationId) || state.stations[0];
+            state.selectedStationId = st.id;
+            document.getElementById('modalStName').textContent = st.name;
+            document.getElementById('modalStAddress').textContent = `${st.area} • ${st.distanceKm.toString().replace('.', ',')} km • ${st.batteriesReady} Baterai & ${st.acSlotsReady} AC Wallbox`;
+
+            if (st.batteriesReady === 0) {
+                selectModalService('ac');
+            } else {
+                selectModalService('swap');
+            }
+            openModal('bookingModal');
+        }
+
+        function selectModalService(srv) {
+            state.selectedService = srv;
+            const swapBtn = document.getElementById('srvBtn-swap');
+            const acBtn = document.getElementById('srvBtn-ac');
+            const tariffSelect = document.getElementById('modalTariffSelect');
+
+            if (srv === 'swap') {
+                swapBtn.className = 'p-3 rounded-xl border-2 border-surya-teal bg-teal-50/60 text-left transition';
+                acBtn.className = 'p-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-left transition';
+                tariffSelect.value = state.hasFreeVoucher ? 'free' : 'swap9k';
+            } else {
+                acBtn.className = 'p-3 rounded-xl border-2 border-surya-teal bg-teal-50/60 text-left transition';
+                swapBtn.className = 'p-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-left transition';
+                tariffSelect.value = 'ac4k';
+            }
+        }
+
+        function selectPayment(method) {
+            state.selectedPayment = method;
+            document.querySelectorAll('.pay-opt-btn').forEach(btn => {
+                if (btn.textContent.trim().includes(method.split(' ')[0])) {
+                    btn.className = 'pay-opt-btn py-2 px-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 text-emerald-800';
+                } else {
+                    btn.className = 'pay-opt-btn py-2 px-2 rounded-xl border border-slate-200 text-slate-700';
+                }
+            });
+        }
+
+        function confirmSmartBooking() {
+            const st = state.stations.find(s => s.id === state.selectedStationId) || state.stations[0];
+            const tariffVal = document.getElementById('modalTariffSelect').value;
+
+            let priceText = 'Rp 9.000';
+            if (tariffVal === 'free') priceText = 'Rp 0 (Voucher Free Swap)';
+            if (tariffVal === 'sub') priceText = 'Rp 0 (Potong Kuota Armada)';
+            if (tariffVal === 'ac4k') priceText = 'Rp 4.000 (1 Jam AC 7,4 kW)';
+
+            document.getElementById('bkStationName').textContent = `${st.name} (${st.area})`;
+            document.getElementById('bkServiceType').textContent = state.selectedService === 'swap'
+                ? 'Tukar Baterai Kilat (<2 Menit)'
+                : 'Destination Charging (AC Wallbox 7,4 kW)';
+            document.getElementById('bkSlotInfo').textContent = state.selectedService === 'swap'
+                ? 'Slot Kabinet #04 (SoC 100% • SoH 98%)'
+                : 'Port Wallbox #AC-01 (7,4 kW Siap)';
+            document.getElementById('bkPaymentMethod').textContent = state.selectedPayment;
+            document.getElementById('bkTotalPrice').textContent = priceText;
+            document.getElementById('bannerStationName').textContent = `${st.name} • ${state.selectedService === 'swap' ? 'Slot #04' : 'Port AC-01'}`;
+
+            // Activate 15-minute countdown
+            state.bookingActive = true;
+            state.bookingSecondsLeft = 15 * 60;
+            document.getElementById('inAppBookingBanner').classList.remove('hidden');
+            document.getElementById('globalActiveBookingBadge').classList.remove('hidden');
+            document.getElementById('globalActiveBookingBadge').classList.add('flex');
+            document.getElementById('navBookingDot').classList.remove('hidden');
+
+            if (state.bookingInterval) clearInterval(state.bookingInterval);
+            state.bookingInterval = setInterval(() => {
+                if (state.bookingSecondsLeft > 0) {
+                    state.bookingSecondsLeft--;
+                    const m = String(Math.floor(state.bookingSecondsLeft / 60)).padStart(2, '0');
+                    const s = String(state.bookingSecondsLeft % 60).padStart(2, '0');
+                    const formatted = `${m}:${s}`;
+                    document.getElementById('bookingTabTimer').textContent = formatted;
+                    document.getElementById('bannerTimer').textContent = formatted;
+                    document.getElementById('globalTimerText').textContent = formatted;
+                }
+            }, 1000);
+
+            closeModal('bookingModal');
+            switchMainMode('b2c');
+            switchAppTab('booking');
+            showToast(`Stok baterai di ${st.name} berhasil dikunci selama 15 menit!`);
+        }
+
+        // --- 5. INSTANT <2 MINUTE BATTERY SWAP SIMULATION ---
+        function simulateInstantSwap() {
+            const btn = document.getElementById('btnSimulateSwap');
+            const progressBox = document.getElementById('swapProgressBox');
+            const bar = document.getElementById('swapProgressBar');
+            const stepLabel = document.getElementById('swapStepLabel');
+            const secLabel = document.getElementById('swapElapsedSec');
+
+            btn.disabled = true;
+            btn.classList.add('opacity-60');
+            progressBox.classList.remove('hidden');
+
+            const steps = [
+                { pct: 25, text: '1/4 Memindai QR & Membuka Pintu Slot Kosong...', sec: '00:15 dtk' },
+                { pct: 55, text: '2/4 Memeriksa IoT State of Health (SoH) Baterai Lama...', sec: '00:38 dtk' },
+                { pct: 85, text: '3/4 Membuka Slot #04 (Baterai Penuh 100% Energi Surya)...', sec: '01:02 dtk' },
+                { pct: 100, text: '4/4 Penukaran Selesai! Menerbitkan Resi & Carbon Offset...', sec: '01:18 dtk' }
+            ];
+
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < steps.length) {
+                    bar.style.width = steps[i].pct + '%';
+                    stepLabel.textContent = steps[i].text;
+                    secLabel.textContent = steps[i].sec;
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    completeSwapTransaction();
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-60');
+                    progressBox.classList.add('hidden');
+                }
+            }, 650);
+        }
+
+        function completeSwapTransaction() {
+            const st = state.stations.find(s => s.id === state.selectedStationId) || state.stations[0];
+            const isCharging = state.selectedService === 'ac';
+            const carbonAdded = isCharging ? 2.1 : 1.2;
+            const feeUsed = document.getElementById('bkTotalPrice').textContent;
+
+            // Update User & Station State
+            state.userCarbonKg = +(state.userCarbonKg + carbonAdded).toFixed(1);
+            state.userMoneySaved += 14000;
+            if (state.hasFreeVoucher && feeUsed.includes('Rp 0')) {
+                state.hasFreeVoucher = false;
+                document.getElementById('userQuotaDisplay').textContent = 'Pay-Per-Swap';
+            }
+
+            document.getElementById('userCarbonSaved').textContent = state.userCarbonKg.toString().replace('.', ',');
+            document.getElementById('actTotalCarbon').textContent = state.userCarbonKg.toString().replace('.', ',');
+            document.getElementById('actSavedMoney').textContent = 'Rp ' + state.userMoneySaved.toLocaleString('id-ID');
+
+            // Prepend new activity to history
+            const newTx = {
+                id: 'SD-TX' + Math.floor(88300 + Math.random() * 900),
+                station: st.name,
+                date: '31 Okt 2026 (Baru saja)',
+                type: isCharging ? 'charging' : 'swap',
+                label: isCharging ? 'AC Wallbox 7,4 kW' : 'Tukar Baterai Kilat (78 dtk)',
+                fee: feeUsed,
+                carbonKg: carbonAdded
+            };
+            state.activities.unshift(newTx);
+            renderActivityHistory();
+
+            // Clear Active Booking Banner
+            state.bookingActive = false;
+            if (state.bookingInterval) clearInterval(state.bookingInterval);
+            document.getElementById('inAppBookingBanner').classList.add('hidden');
+            document.getElementById('globalActiveBookingBadge').classList.add('hidden');
+            document.getElementById('navBookingDot').classList.add('hidden');
+
+            // Populate & Show Digital Receipt Modal
+            document.getElementById('rcpTimestamp').textContent = `31 Okt 2026 • ID: ${newTx.id}`;
+            document.getElementById('rcpStation').textContent = st.name;
+            document.getElementById('rcpBattery').textContent = isCharging ? 'Port #AC-01 (7,4 kW)' : 'Slot #04 (SoC 100% • SoH 98%)';
+            document.getElementById('rcpAmount').textContent = feeUsed;
+            document.getElementById('rcpCarbon').textContent = `-${carbonAdded.toString().replace('.', ',')} kg CO₂e`;
+
+            openModal('receiptModal');
+            showToast('Penukaran baterai <2 menit berhasil! +1,2 kg CO₂ dihemat.');
+        }
+
+        // --- 6. ACTIVITY HISTORY & PROFILE ---
+        function filterActivity(type) {
+            state.activityFilter = type;
+            document.querySelectorAll('.act-filter-btn').forEach(btn => {
+                btn.className = 'act-filter-btn px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-600';
+            });
+            event.target.className = 'act-filter-btn px-3 py-1 rounded-full text-xs font-semibold bg-surya-teal text-white';
+            renderActivityHistory();
+        }
+
+        function renderActivityHistory() {
+            const container = document.getElementById('activityListContainer');
+            if (!container) return;
+
+            const filtered = state.activities.filter(a => state.activityFilter === 'all' || a.type === state.activityFilter);
+            document.getElementById('txCountBadge').textContent = `${filtered.length} Transaksi`;
+
+            container.innerHTML = filtered.map(act => `
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between gap-2">
+                    <div class="space-y-0.5">
+                        <div class="flex items-center gap-1.5">
+                            <span class="font-display font-bold text-xs text-slate-900">${act.station}</span>
+                            <span class="text-[10px] font-mono text-slate-400">#${act.id}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600">${act.date} &bull; ${act.label}</p>
+                        <p class="text-[11px] font-bold text-emerald-700">
+                            <i class="ph-fill ph-leaf mr-1"></i>Estimasi CO₂ dihemat: ${act.carbonKg.toString().replace('.', ',')} kg
+                        </p>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <span class="text-xs font-extrabold text-slate-900 block">${act.fee}</span>
+                        <span class="inline-block mt-1 text-[10px] font-semibold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full">
+                            Selesai
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateUserMotor(val) {
+            const shortName = val.split(' (')[0];
+            document.getElementById('userMotorBrand').textContent = shortName;
+            document.getElementById('bkMotorBrand').textContent = val;
+            showToast(`Kendaraan aktif diubah ke ${shortName}`);
+        }
+
+        function activateMonthlyPlan() {
+            document.getElementById('userQuotaDisplay').textContent = '30x Kuota Armada';
+            showToast('Paket Langganan Armada (Rp 200.000/bln) berhasil diaktifkan!');
+        }
+
+        function copyReferralCode() {
+            const input = document.getElementById('referralCodeInput');
+            input.select();
+            document.execCommand('copy');
+            state.hasFreeVoucher = true;
+            document.getElementById('userQuotaDisplay').textContent = '2x Free Voucher';
+            showToast('Kode Referral disalin! Bonus 1x Voucher Tukar Baterai ditambahkan.');
+        }
+
+        // --- 7. B2B SURYAESG & SURYALOOP BATTERY CIRCULARITY ---
+        function updateB2BDashboard() {
+            const partner = document.getElementById('b2bPartnerSelect').value;
+            const dataMap = {
+                ut: {
+                    name: 'Universitas Terbuka Bandung',
+                    carbon: '1.842,6 kg CO₂e',
+                    trees: '84',
+                    solar: '2.410 kWh',
+                    mix: '78% Solar + BESS',
+                    rev: 'Rp 3.450.000'
+                },
+                dago: {
+                    name: 'Kafe & Co-Working Dago Atas',
+                    carbon: '980,4 kg CO₂e',
+                    trees: '45',
+                    solar: '1.290 kWh',
+                    mix: '74% Solar + BESS',
+                    rev: 'Rp 2.150.000'
+                },
+                all: {
+                    name: 'Konsolidasi Bandung Raya (4 Hub)',
+                    carbon: '5.420,0 kg CO₂e',
+                    trees: '248',
+                    solar: '7.120 kWh',
+                    mix: '81% Solar + BESS',
+                    rev: 'Rp 11.200.000'
+                }
+            };
+            const d = dataMap[partner];
+            document.getElementById('b2bKpiCarbon').textContent = d.carbon;
+            document.getElementById('b2bKpiTrees').textContent = d.trees;
+            document.getElementById('b2bKpiSolar').textContent = d.solar;
+            document.getElementById('b2bKpiMix').textContent = d.mix;
+            document.getElementById('b2bKpiPartnerRev').innerHTML = `${d.rev}<span class="text-xs font-normal text-slate-400">/bln</span>`;
+            document.getElementById('esgCertPartner').textContent = d.name;
+        }
+
+        function renderBatteryLifecycleGrid() {
+            const grid = document.getElementById('batteryLifecycleGrid');
+            if (!grid) return;
+
+            let repurposeCount = 0;
+            let secondLifeCount = 0;
+
+            grid.innerHTML = state.batteries.map((bat, idx) => {
+                if (bat.stage === 'repurpose-ready') repurposeCount++;
+                if (bat.stage === 'second-life') secondLifeCount++;
+
+                let badgeClass = 'bg-emerald-100 text-emerald-800';
+                let borderClass = 'border-slate-200';
+                let actionHtml = '';
+
+                if (bat.stage === 'repurpose-ready') {
+                    badgeClass = 'bg-amber-100 text-amber-800 border border-amber-300';
+                    borderClass = 'border-2 border-amber-400 bg-amber-50/30';
+                    actionHtml = `
+                        <button onclick="repurposeBatteryToBess(${idx})" class="mt-2 w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-[11px] py-1.5 px-2.5 rounded-lg shadow-sm transition flex items-center justify-center gap-1">
+                            <i class="ph-bold ph-recycle"></i> Alihkan ke Second-Life BESS
+                        </button>`;
+                } else if (bat.stage === 'second-life') {
+                    badgeClass = 'bg-teal-100 text-surya-teal';
+                    borderClass = 'border-teal-300 bg-teal-50/20';
+                }
+
+                return `
+                <div class="rounded-xl p-3.5 border ${borderClass} space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="font-mono font-bold text-slate-900">${bat.id} (${bat.slot})</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeClass}">${bat.status}</span>
+                    </div>
+                    <div class="grid grid-cols-3 gap-1 text-[11px] bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <div>
+                            <span class="text-slate-400 block text-[9px]">SoC Daya</span>
+                            <strong class="text-slate-800">${bat.soc}%</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[9px]">Kesehatan SoH</span>
+                            <strong class="${bat.soh < 80 ? 'text-amber-600' : 'text-emerald-600'}">${bat.soh}%</strong>
+                        </div>
+                        <div>
+                            <span class="text-slate-400 block text-[9px]">Siklus/Suhu</span>
+                            <strong class="text-slate-800">${bat.cycles}x • ${bat.temp}°C</strong>
+                        </div>
+                    </div>
+                    ${actionHtml}
+                </div>`;
+            }).join('');
+
+            document.getElementById('repurposeAlertCount').textContent = repurposeCount;
+            document.getElementById('b2bKpiSecondLife').textContent = `${secondLifeCount + 2} Second-Life BESS`;
+        }
+
+        function repurposeBatteryToBess(index) {
+            const bat = state.batteries[index];
+            bat.stage = 'second-life';
+            bat.slot = 'BESS #A3';
+            bat.status = 'Second-Life BESS';
+            renderBatteryLifecycleGrid();
+            document.getElementById('iotRepurposedCount').textContent = '5 modul baterai eks-armada';
+            document.getElementById('iotBessPct').textContent = '98%';
+            document.getElementById('iotBessBar').style.width = '98%';
+            showToast(`Baterai ${bat.id} (SoH ${bat.soh}%) berhasil dialihfungsikan ke unit penyimpanan Second-Life BESS!`);
+        }
+
+        function runFinancialCalc() {
+            const stations = parseInt(document.getElementById('calcStations').value, 10);
+            const swapsPerDay = parseInt(document.getElementById('calcSwaps').value, 10);
+            const acHoursPerDay = parseInt(document.getElementById('calcAcHours').value, 10);
+
+            document.getElementById('calcStationLabel').textContent = `${stations} Stasiun Hub`;
+            document.getElementById('calcSwapsLabel').textContent = swapsPerDay;
+            document.getElementById('calcAcHoursLabel').textContent = acHoursPerDay;
+
+            // Monthly Revenue Formula based on Page 13-14 of Proposal
+            const swapRev = stations * swapsPerDay * 9000 * 30;
+            const acRev = stations * acHoursPerDay * 4000 * 30;
+            const saasRev = stations * 2000000; // SaaS SuryaESG Rp 2jt/partner
+            const gross = swapRev + acRev + saasRev;
+
+            const partnerShare = Math.round(gross * 0.125); // 12.5% Amenity Partner
+            const opex = stations * 4000000; // Rp 4jt OPEX/station
+            const netProfit = Math.max(0, gross - partnerShare - opex);
+            const capexTotal = stations * 95000000;
+            const bepMonths = netProfit > 0 ? Math.min(24, Math.max(11, Math.round(capexTotal / netProfit))) : 24;
+
+            document.getElementById('calcGrossRev').textContent = 'Rp ' + gross.toLocaleString('id-ID');
+            document.getElementById('calcPartnerShare').textContent = 'Rp ' + partnerShare.toLocaleString('id-ID');
+            document.getElementById('calcNetProfit').textContent = 'Rp ' + netProfit.toLocaleString('id-ID');
+            document.getElementById('calcBepEstimate').textContent = `Estimasi Payback / BEP: ~${bepMonths} Bulan`;
+        }
+
+        // --- 8. STATION HUB 24/7 HARDWARE SIMULATOR ---
+        function renderHardwareCabinet() {
+            const container = document.getElementById('hardwareCabinetSlots');
+            if (!container) return;
+
+            const slots = [
+                { num: '01', soc: 100, soh: 99, state: 'ready' },
+                { num: '02', soc: 100, soh: 96, state: 'ready' },
+                { num: '03', soc: 68,  soh: 94, state: 'charging' },
+                { num: '04', soc: 100, soh: 98, state: state.bookingActive ? 'locked' : 'ready' },
+                { num: '05', soc: 100, soh: 92, state: 'ready' },
+                { num: '06', soc: 100, soh: 95, state: 'ready' },
+                { num: '07', soc: 100, soh: 91, state: 'ready' },
+                { num: '08', soc: 0,   soh: 0,  state: 'empty' }
+            ];
+
+            container.innerHTML = slots.map(s => {
+                if (s.state === 'empty') {
+                    return `
+                    <div class="bg-slate-900/70 border border-dashed border-white/20 rounded-xl p-3 flex items-center justify-between text-xs text-slate-400">
+                        <span class="font-mono font-bold">#${s.num}</span>
+                        <span>Slot Kosong (Terima Baterai)</span>
+                    </div>`;
+                }
+                if (s.state === 'locked') {
+                    return `
+                    <div class="bg-amber-400/20 border-2 border-amber-400 rounded-xl p-3 flex items-center justify-between text-xs">
+                        <div>
+                            <span class="font-mono font-bold text-amber-300">#${s.num} • DIKUNCI</span>
+                            <p class="text-[10px] text-white">Smart Booking Aktif</p>
+                        </div>
+                        <i class="ph-fill ph-lock-key text-xl text-amber-300"></i>
+                    </div>`;
+                }
+                const isReady = s.soc === 100;
+                return `
+                <div class="bg-black/25 border ${isReady ? 'border-emerald-400/50' : 'border-amber-400/40'} rounded-xl p-3 flex items-center justify-between text-xs">
+                    <div>
+                        <span class="font-mono font-bold ${isReady ? 'text-emerald-300' : 'text-amber-300'}">#${s.num} • ${s.soc}%</span>
+                        <p class="text-[10px] text-teal-100">SoH ${s.soh}% • ${isReady ? 'Siap Swap' : 'Solar Charging'}</p>
+                    </div>
+                    <i class="ph-fill ${isReady ? 'ph-battery-full text-emerald-400' : 'ph-battery-charging text-amber-400'} text-2xl"></i>
+                </div>`;
+            }).join('');
+        }
+
+        function setStationWeather(mode) {
+            state.weather = mode;
+            ['sunny', 'cloudy', 'rainy'].forEach(w => {
+                const btn = document.getElementById(`weatherBtn-${w}`);
+                btn.className = (w === mode)
+                    ? 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-400 text-slate-950 shadow-sm flex items-center gap-1'
+                    : 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600 hover:bg-white flex items-center gap-1';
+            });
+
+            if (mode === 'sunny') {
+                document.getElementById('iotSolarOutputText').textContent = '4.8 kW Output (Puncak)';
+                document.getElementById('iotWeatherDesc').textContent = 'Cerah Optimal • 100% Tenaga Surya';
+                document.getElementById('iotFlowStatus').textContent = 'Solar PV Mengisi BESS & Kabinet';
+                document.getElementById('iotGridStatus').textContent = 'Standby (0% Beban PLN)';
+                document.getElementById('tickerWeather').textContent = 'Cerah (Solar PV 4.8 kWp Aktif)';
+            } else if (mode === 'cloudy') {
+                document.getElementById('iotSolarOutputText').textContent = '1.9 kW Output (Parsial)';
+                document.getElementById('iotWeatherDesc').textContent = 'Mendung • Suplai Di-backup SuryaLoop BESS';
+                document.getElementById('iotFlowStatus').textContent = 'Solar PV + Second-Life BESS Aktif';
+                document.getElementById('iotGridStatus').textContent = 'Standby (Disuplai BESS)';
+                document.getElementById('tickerWeather').textContent = 'Mendung (Hibrida Solar + BESS)';
+            } else {
+                document.getElementById('iotSolarOutputText').textContent = '0.2 kW Output (Hujan)';
+                document.getElementById('iotWeatherDesc').textContent = 'Hujan Deras • Mitigasi Hibrida Otomatis';
+                document.getElementById('iotFlowStatus').textContent = 'BESS + Grid Hibrida Menjaga Zero Downtime';
+                document.getElementById('iotGridStatus').textContent = 'Aktif Hibrida (Zero Downtime 24/7)';
+                document.getElementById('tickerWeather').textContent = 'Hujan (BESS + Hibrida Aktif)';
+            }
+            showToast(`Mode cuaca stasiun diubah ke: ${mode.toUpperCase()}`);
+        }
+
+        function toggleAcWallbox(portNum) {
+            const port = state.acPorts[portNum];
+            port.busy = !port.busy;
+            const badge = document.getElementById(`acPort${portNum}Badge`);
+            const info = document.getElementById(`acPort${portNum}Info`);
+            const btn = document.getElementById(`acPort${portNum}Btn`);
+
+            if (port.busy) {
+                badge.className = 'text-[10px] font-bold bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full';
+                badge.textContent = 'Sedang Mengisi';
+                info.textContent = 'Motor Komuter • Mengisi daya 7,4 kW (Rp 4.000/jam)';
+                btn.className = 'w-full bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold py-2 rounded-lg transition';
+                btn.textContent = 'Hentikan & Cetak Resi';
+                showToast(`Wallbox Port #AC-0${portNum} mulai mengisi daya kendaraan.`);
+            } else {
+                badge.className = 'text-[10px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full';
+                badge.textContent = 'Tersedia';
+                info.textContent = 'Daya: 7,4 kW Type-2 / Plug-in EV';
+                btn.className = 'w-full bg-surya-teal hover:bg-surya-dark text-white text-xs font-bold py-2 rounded-lg transition';
+                btn.textContent = 'Mulai Charging (Simulasi)';
+                showToast(`Sesi AC Wallbox #AC-0${portNum} selesai. Resi digital dikirim ke SuryaGo.`);
+            }
+        }
+
+        // --- 9. MODAL & TOAST UTILITIES ---
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl border border-emerald-500/40 flex items-center gap-2 transition-all duration-300';
+            toast.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400 text-base"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        // --- INITIALIZE ON LOAD ---
+        window.onload = function () {
+            renderStationCards();
+            renderActivityHistory();
+            renderBatteryLifecycleGrid();
+            renderHardwareCabinet();
+            runFinancialCalc();
+        };
+    </script>
+</body>
+</html>
